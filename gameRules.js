@@ -68,6 +68,8 @@ function winningCard(player1, player2) {
   const { currentCard: player1Card } = player1;
   const { currentCard: player2Card } = player2;
 
+  if (player1.team == player2.team) return;
+
   if (player1Card.suit == Game.winningSuit) {
     if (player2Card.suit != player1Card.suit) {
       return player1;
