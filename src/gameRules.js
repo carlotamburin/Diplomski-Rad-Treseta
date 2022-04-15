@@ -1,7 +1,5 @@
-import SUITS from "./deck.js";
-import VALUES from "./deck.js";
-import sample from "./lodash/sample.js";
-import shuffle from "./lodash/shuffle.js";
+import sample from "lodash/sample.js";
+import shuffle from "lodash/shuffle.js";
 import Game from "./gameTrack.js";
 
 let TABLE_POSITION = { left: 1, up: 2, right: 1, down: 2 };
@@ -53,7 +51,7 @@ export function playTurn(...players) {
   cardsThrown += 1;
   console.log(lastWinner.currentCard);
 
-  while (cardsThrown != 4) {
+  while (cardsThrown !== 4) {
     let secondPlayer = nextPlayer(Game.lastPlayer);
     secondPlayer.currentCard = secondPlayer
       .playCard(sample(secondPlayer.hand))
@@ -71,16 +69,16 @@ function winningCard(player1, player2) {
   const { currentCard: player1Card } = player1;
   const { currentCard: player2Card } = player2;
 
-  if (player1Card.suit == Game.winningSuit) {
-    if (player2Card.suit != player1Card.suit) {
+  if (player1Card.suit === Game.winningSuit) {
+    if (player2Card.suit !== player1Card.suit) {
       return player1;
     }
     if (CARD_VALUE_MAP[player1Card.value] > CARD_VALUE_MAP[player2Card.value]) {
       return player1;
     }
     return player2;
-  } else if (player2Card.suit == Game.winningSuit) {
-    if (player1Card.suit != player2Card.suit) {
+  } else if (player2Card.suit === Game.winningSuit) {
+    if (player1Card.suit !== player2Card.suit) {
       return player2;
     }
     if (CARD_VALUE_MAP[player2Card.value] > CARD_VALUE_MAP[player1Card.value]) {
