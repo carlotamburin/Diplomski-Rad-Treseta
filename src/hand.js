@@ -8,10 +8,6 @@ export default class Hand {
     this.playerType = "";
   }
 
-  drawCard(Deck) {
-    this.hand = this.hand.concat(Deck.splice(0, 1));
-  }
-
   playCard(playerCard) {
     for (const card of this.hand) {
       if (card.suit === playerCard.suit && card.value === playerCard.value) {
