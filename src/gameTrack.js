@@ -4,4 +4,5 @@ export default class Game {
   static team2Points = 0;
   static lastPlayer = "";
   static tableSet = {};
+  static gameNumber = 0;
 }

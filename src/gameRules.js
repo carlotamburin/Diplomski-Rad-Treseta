@@ -1,5 +1,6 @@
 import sample from "lodash/sample.js";
 import shuffle from "lodash/shuffle.js";
+import { useEffect, useRef } from "react";
 import Game from "./gameTrack.js";
 
 let TABLE_POSITION = { left: 1, up: 2, right: 1, down: 2 };
@@ -28,7 +29,6 @@ export function takeSeat(...players) {
 }
 
 function lastTurnWinner(player1, player2, player3, player4) {
-  player1.winner = true; // za sad je hardcodano
   let lastTurnWinner = {};
   for (let i = 0; i < arguments.length; i++) {
     const player = arguments[i];
@@ -41,7 +41,14 @@ function lastTurnWinner(player1, player2, player3, player4) {
 
 export function playTurn(...players) {
   let cardsThrown = 0;
+
+  // if (Game.gameNumber === 0) {
+  //   whoPlaysFirst(...players);
+  // }
+  whoPlaysFirst(...players);
+
   let lastWinner = lastTurnWinner(...players);
+
   const { hand: lastTurnWinnerHand } = lastWinner;
 
   lastWinner.currentCard = lastWinner
@@ -63,6 +70,8 @@ export function playTurn(...players) {
     Game.lastPlayer = secondPlayer;
   }
   console.log("Pobjednicka karta je: ", lastWinner.currentCard);
+
+  nextTurn(lastWinner, ...players);
 }
 
 function winningCard(player1, player2) {
@@ -102,3 +111,35 @@ function nextPlayer(lastPlayer) {
 
   return Game.tableSet[val];
 }
+
+function whoPlaysFirst(...players) {
+  let firstPlaying = sample(players);
+  firstPlaying.winner = true;
+}
+
+function nextTurn(lastWinner, ...players) {
+  Game.gameNumber += 1;
+
+  for (const player of players) {
+    if (player !== lastWinner) player.winner = false;
+  }
+}
+
+export const useFrameLoop = (callback) => {
+  const requestID = useRef();
+  const previousTime = useRef();
+
+  const loop = (time) => {
+    if (previousTime.current !== undefined) {
+      const deltaTime = time - previousTime.current;
+      callback(time, deltaTime);
+    }
+    previousTime.current = time;
+    requestID.current = requestAnimationFrame(loop);
+  };
+  useEffect(() => {
+    requestID.current = requestAnimationFrame(loop);
+
+    return () => cancelAnimationFrame(requestID.current);
+  }, []);
+};
