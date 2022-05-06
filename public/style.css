@@ -1,0 +1,156 @@
+/*****************************************
+SELECTION METHODS AND CSS3 PROPERTIES
+******************************************/
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: darkgreen;
+  background-color: #0c6339;
+}
+
+ul,
+li,
+ol {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.point {
+  background: red;
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 100%;
+}
+
+/* 1 -  By TAG (html name)
+     Straigh selection from the DOM element 
+    ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
+
+ul {
+  position: relative;
+  margin: 0 auto;
+  margin-top: 160px;
+
+  width: auto;
+  height: auto;
+  min-width: 300px;
+  min-height: 900px;
+  width: 100%;
+  max-width: 1000px;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+li {
+  float: right;
+  width: 200px;
+  height: 300px;
+
+  margin: 20px 10px;
+  background: azure;
+  font-size: 60px;
+  padding: 10px 20px;
+  color: black;
+  border: 1px solid rgba(100, 100, 100, 0.1);
+  position: relative;
+
+  /*
+        flex-direction: row | row-reverse | column | column-reverse;
+        */
+
+  /* ↓↓↓ CSS3 ↓↓↓*/
+  border-radius: 6px;
+  /* X Y BLUR*/
+  box-shadow: 1px 3px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Chainning rules by a (,):
+    all the element get the same style applied. 
+    Also, specificity wins over stacking order
+    (this rule overwrites the previous ones) */
+
+/*we put this in here to overwrite the previous rule ... */
+#hand {
+  display: block;
+  /*just to overwrite previous rules*/
+  border: none;
+  margin-left: -200px;
+}
+
+/************** some temporary positioning *************/
+
+#hand {
+  display: block;
+  border: none;
+  margin-left: auto;
+  width: 400px;
+  margin-right: auto;
+}
+
+/*...but specificity beats stacking order */
+
+#hand .card {
+  /* some css properties accept negative values */
+  margin-right: -120px;
+  display: inline-block;
+  position: relative;
+  text-align: right;
+  z-index: 1000;
+  transition: transform 0.2s ease-out;
+}
+
+
+/*pseudo selector:hover -  apply effects when user 
+    enter the pointer inside the element*/
+#hand .card:hover {
+  cursor: pointer;
+  transform: translate(2%, -10%) rotate(19deg);
+  transform-origin: bottom right;
+}
+
+/* each span contains the card symbol */
+ul li span {
+  display: inline-block;
+  position: relative;
+}
+
+/* Modifying objects: jquery */
+li.card {
+  transition: all 0.2s ease-in-out;
+}
+
+li.card:hover {
+  z-index: 5000;
+}
+
+li.card-behind {
+  transition: all 0.4s ease-out;
+  background: linear-gradient(rgb(40, 40, 40), rgb(20, 20, 20));
+  transform: scale(0.85, 0.85);
+  color: grey;
+  z-index: 1;
+}
+
+/*not yet used: the backface of each card */
+li.card-behind:nth-child(even) {
+  color: grey;
+}
+„
+
+/* 1 -  for the ACE of SPADES
+    ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ */
+
+ul#hand li.card#ace {
+
+  transition: all 0.25s ease-in;
+}

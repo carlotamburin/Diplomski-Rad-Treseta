@@ -1,31 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { isEmpty } from "lodash";
 import { Deck } from "./deck.js";
 import { MapImageToCard } from "./CardImages.js";
 import Hand from "./hand.js";
-import { playTurn, takeSeat, useFrameLoop } from "./gameRules.js";
+import Game from "./gameTrack.js";
+import { playTurn, takeSeat } from "./gameRules.js";
 
 function App() {
-  const [time, setTime] = useState(0);
-  const [deltaTime, setDeltaTime] = useState(0);
+  const [deck, setDeck] = useState(new Deck());
+  deck.shuffler();
+  const [player1, setPlayer1] = useState(new Hand(deck.cards));
+  const [player2, setPlayer2] = useState(new Hand(deck.cards));
+  const [player3, setPlayer3] = useState(new Hand(deck.cards));
+  const [player4, setPlayer4] = useState(new Hand(deck.cards));
 
   // initial load
-  const deck = new Deck();
-  deck.shuffler();
-  const player1 = new Hand(deck.cards);
-  const player2 = new Hand(deck.cards);
-  const player3 = new Hand(deck.cards);
-  const player4 = new Hand(deck.cards);
-  takeSeat(player1, player2, player3, player4);
+  useEffect(() => {
+    takeSeat(player1, player2, player3, player4);
+  }, [Game.gameNumber]);
 
-  useFrameLoop((time, deltaTime) => {
-    // To je taj game loop
-    setTime(time);
-    setDeltaTime(deltaTime);
+  useEffect(() => {
+    playTurn(player1, player2, player3, player4);
   });
 
-  playTurn(player1, player2, player3, player4); //Ovo mi je turn i logika zelim da se samo jednom izvrši te nakon nekog uvjeta opet dok ne dode do kraja igre a ne 60 puta u sekundi
-
-  return <MapImageToCard card={player1.hand[2]} />; // Ovo je iscrtavanje karata (tu bi tia da gleda jeli se state karata prominia i rerendera ruku)
+  return (
+    <MapImageToCard
+      hand1={player1.hand}
+      hand2={player2.hand}
+      hand3={player3.hand}
+      hand4={player4.hand}
+    />
+  );
 }
 export default App;

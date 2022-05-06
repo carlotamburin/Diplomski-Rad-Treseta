@@ -24,7 +24,6 @@ export function takeSeat(...players) {
     players[i].position = table.splice(0, 1).shift();
     players[i].team = TABLE_POSITION[players[i].position];
     Game.tableSet[players[i].position] = players[i];
-    //console.log(players[i].position + ":" + players[i].team);
   }
 }
 
@@ -42,9 +41,6 @@ function lastTurnWinner(player1, player2, player3, player4) {
 export function playTurn(...players) {
   let cardsThrown = 0;
 
-  // if (Game.gameNumber === 0) {
-  //   whoPlaysFirst(...players);
-  // }
   whoPlaysFirst(...players);
 
   let lastWinner = lastTurnWinner(...players);
@@ -113,33 +109,19 @@ function nextPlayer(lastPlayer) {
 }
 
 function whoPlaysFirst(...players) {
-  let firstPlaying = sample(players);
-  firstPlaying.winner = true;
+  if (Game.gameNumber === 0) {
+    let firstPlaying = sample(players);
+    firstPlaying.winner = true;
+    Game.whoPlayedFirst = firstPlaying;
+  }
+  let nextFirstPlayer = nextPlayer(Game.whoPlayedFirst);
+  nextFirstPlayer.winner = true;
+  Game.whoPlayedFirst = nextFirstPlayer;
 }
 
 function nextTurn(lastWinner, ...players) {
-  Game.gameNumber += 1;
-
   for (const player of players) {
     if (player !== lastWinner) player.winner = false;
   }
+  Game.gameNumber += 1;
 }
-
-export const useFrameLoop = (callback) => {
-  const requestID = useRef();
-  const previousTime = useRef();
-
-  const loop = (time) => {
-    if (previousTime.current !== undefined) {
-      const deltaTime = time - previousTime.current;
-      callback(time, deltaTime);
-    }
-    previousTime.current = time;
-    requestID.current = requestAnimationFrame(loop);
-  };
-  useEffect(() => {
-    requestID.current = requestAnimationFrame(loop);
-
-    return () => cancelAnimationFrame(requestID.current);
-  }, []);
-};
