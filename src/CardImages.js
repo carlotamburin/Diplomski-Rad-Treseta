@@ -88,33 +88,9 @@ const svgImages = {
   CardSKG,
 };
 
-// export function MapImageToCard({card}) {
-//   //Primat ce 4 niza karata 10*4
-//   // Kroz for peltju ce za svaki niz pozvati CreateCardIMage
-//   let cardName = "Card" + card.suit + card.value;
-//   if (cardName in svgImages) console.log("Card is here :) " + cardName);
-
-//   return (
-//     <div>
-//       <CreateCardImage Card={svgImages[cardName]} />
-//     </div>
-//   );
-// }
-
-// export function CreateCardImage({ Card }) {
-//   //Za svaki element niza ce napraviti kartu
-//   return (
-//     <ul id="hand">
-//       <Card className="card" />
-//     </ul>
-//   );
-// }
-
 export function MapImageToCard(props) {
-  const { hand1, hand2, hand3, hand4 } = props;
-
   return (
-    <div>
+    <div className="playingCards rotateHand">
       {Object.keys(props).map((hand, index) => (
         <CreateCardImage
           Hand={props[hand]}
@@ -127,12 +103,13 @@ export function MapImageToCard(props) {
 }
 
 export function CreateCardImage({ Hand, playerNumber }) {
+  let playerNumberforClass = "hand" + playerNumber;
   return (
-    <ul id="hand">
-      {Hand.map((Card) => {
+    <ul id="hand" className={playerNumberforClass}>
+      {Hand.map((Card, index) => {
         let cardName = "Card" + Card.suit + Card.value;
         let Cards = svgImages[cardName];
-        return <Cards className="card" />;
+        return <Cards className="card" key={index + 1} />;
       })}
     </ul>
   );

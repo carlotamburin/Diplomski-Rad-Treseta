@@ -29,7 +29,7 @@ function freshDeck() {
   return SUITS.flatMap((suit) => {
     //funkcionira kao ugnježđena for petlja
     return VALUES.map((value) => {
-      return new Card(suit, value, "");
+      return new Card(suit, value);
     });
   });
 }
