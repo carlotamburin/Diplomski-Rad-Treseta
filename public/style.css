@@ -8,10 +8,13 @@ SELECTION METHODS AND CSS3 PROPERTIES
 body {
   background-color: darkgreen;
   background-color: #0c6339;
+  /* width: 100%;
+  height: 100%;
+  overflow: hidden */
 }
 
 .playingCards .card {
-  display: inline-block;
+  display: inline-flex;
   width: 3.3em;
   height: 4.6em;
   border: 1px solid #666;
@@ -20,7 +23,7 @@ body {
   -webkit-border-radius: 0.3em;
   -khtml-border-radius: 0.3em;
   padding: 0.25em;
-  margin: 0 0.5em 0.5em 0;
+  margin: -1.5em -1em -1.5em 0em;
   text-align: center;
   font-size: 1.2em; /* @change: adjust this value to make bigger or smaller cards */
   font-weight: normal;
@@ -85,170 +88,43 @@ body {
   clear: both;
 }
 
-.playingCards ul.hand {
-  margin-bottom: 3.5em;
-}
-.playingCards ul.table li,
-.playingCards ul.hand li,
-.playingCards ul.deck li {
-  margin: 0;
-  padding: 0;
-  list-style-type: none;
-  float: left;
+/*Verikalni razmak */
+.playingCards ul.hand > * {
+  padding: 30px;
 }
 
-.playingCards ul.hand,
-.playingCards ul.deck {
-  height: 8em;
+/* Moj css */
+
+.cardH2 {
+  transform: rotate(90deg);
 }
-.playingCards ul.hand li,
-.playingCards ul.deck li {
-  position: absolute;
+.cardH3 {
+  transform: rotate(270deg);
 }
-.playingCards ul.hand li {
-  bottom: 0;
+.cardH1 {
+  transform: rotate(180deg);
 }
 
-.playingCards ul.hand #li:nth-child(1) {
-  left: 0;
-}
-.playingCards ul.hand li:nth-child(2) {
-  left: 1.1em;
-}
-.playingCards ul.hand li:nth-child(3) {
-  left: 2.2em;
-}
-.playingCards ul.hand li:nth-child(4) {
-  left: 3.3em;
-}
-.playingCards ul.hand li:nth-child(5) {
-  left: 4.4em;
-}
-.playingCards ul.hand li:nth-child(6) {
-  left: 5.5em;
-}
-.playingCards ul.hand li:nth-child(7) {
-  left: 6.6em;
-}
-.playingCards ul.hand li:nth-child(8) {
-  left: 7.7em;
-}
-.playingCards ul.hand li:nth-child(9) {
-  left: 8.8em;
-}
-.playingCards ul.hand li:nth-child(10) {
-  left: 9.9em;
-}
-.playingCards ul.hand li:nth-child(11) {
-  left: 11em;
-}
-.playingCards ul.hand li:nth-child(12) {
-  left: 12.1em;
-}
-.playingCards ul.hand li:nth-child(13) {
-  left: 13.2em;
+.playingCards {
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
 }
 
-.playingCards ul.hand li:nth-child(14) {
-  left: 14.3em;
+.hand1 {
+  grid-area: 1 / 2 / 2 / 10;
+  place-self: center;
+  margin-bottom: -5px;
 }
-.playingCards ul.hand li:nth-child(15) {
-  left: 15.4em;
+.hand2 {
+  grid-area: 3 / 1 / 10 / 2;
 }
-.playingCards ul.hand li:nth-child(16) {
-  left: 16.5em;
+.hand4 {
+  grid-area: 10 / 2 / 11 / 10;
+  place-self: center;
 }
-.playingCards ul.hand li:nth-child(17) {
-  left: 17.6em;
-}
-.playingCards ul.hand li:nth-child(18) {
-  left: 18.7em;
-}
-.playingCards ul.hand li:nth-child(19) {
-  left: 19.8em;
-}
-.playingCards ul.hand li:nth-child(20) {
-  left: 20.9em;
-}
-.playingCards ul.hand li:nth-child(21) {
-  left: 22em;
-}
-.playingCards ul.hand li:nth-child(22) {
-  left: 23.1em;
-}
-.playingCards ul.hand li:nth-child(23) {
-  left: 24.2em;
-}
-.playingCards ul.hand li:nth-child(24) {
-  left: 25.3em;
-}
-.playingCards ul.hand li:nth-child(25) {
-  left: 26.4em;
-}
-.playingCards ul.hand li:nth-child(26) {
-  left: 27.5em;
-}
-
-/* rotate cards if rotateHand option is on */
-.playingCards.rotateHand ul.hand li:nth-child(1) {
-  -moz-transform: translate(1.9em, 0.9em) rotate(-42deg);
-  -webkit-transform: translate(1.9em, 0.9em) rotate(-42deg);
-  -o-transform: translate(1.9em, 0.9em) rotate(-42deg);
-  transform: translate(1.9em, 0.9em) rotate(-42deg);
-}
-
-.playingCards.rotateHand ul.hand li:nth-child(2) {
-  -moz-transform: translate(1.5em, 0.5em) rotate(-33deg);
-  -webkit-transform: translate(1.5em, 0.5em) rotate(-33deg);
-  -o-transform: translate(1.5em, 0.5em) rotate(-33deg);
-  transform: translate(1.5em, 0.5em) rotate(-33deg);
-}
-.playingCards.rotateHand ul.hand li:nth-child(3) {
-  -moz-transform: translate(1.1em, 0.3em) rotate(-24deg);
-  -webkit-transform: translate(1.1em, 0.3em) rotate(-24deg);
-  -o-transform: translate(1.1em, 0.3em) rotate(-24deg);
-  transform: translate(1.1em, 0.3em) rotate(-24deg);
-}
-.playingCards.rotateHand ul.hand li:nth-child(4) {
-  -moz-transform: translate(0.7em, 0.2em) rotate(-15deg);
-  -webkit-transform: translate(0.7em, 0.2em) rotate(-15deg);
-  -o-transform: translate(0.7em, 0.2em) rotate(-15deg);
-  transform: translate(0.7em, 0.2em) rotate(-15deg);
-}
-.playingCards.rotateHand ul.hand li:nth-child(5) {
-  -moz-transform: translate(0.3em, 0.1em) rotate(-6deg);
-  -webkit-transform: translate(0.3em, 0.1em) rotate(-6deg);
-  -o-transform: translate(0.3em, 0.1em) rotate(-6deg);
-  transform: translate(0.3em, 0.1em) rotate(-6deg);
-}
-.playingCards.rotateHand ul.hand li:nth-child(6) {
-  -moz-transform: translate(-0.1em, 0.1em) rotate(3deg);
-  -webkit-transform: translate(-0.1em, 0.1em) rotate(3deg);
-  -o-transform: translate(-0.1em, 0.1em) rotate(3deg);
-  transform: translate(-0.1em, 0.1em) rotate(3deg);
-}
-.playingCards.rotateHand ul.hand li:nth-child(7) {
-  -moz-transform: translate(-0.5em, 0.2em) rotate(12deg);
-  -webkit-transform: translate(-0.5em, 0.2em) rotate(12deg);
-  -o-transform: translate(-0.5em, 0.2em) rotate(12deg);
-  transform: translate(-0.5em, 0.2em) rotate(12deg);
-}
-
-.playingCards.rotateHand ul.hand li:nth-child(8) {
-  -moz-transform: translate(-0.9em, 0.3em) rotate(21deg);
-  -webkit-transform: translate(-0.9em, 0.3em) rotate(21deg);
-  -o-transform: translate(-0.9em, 0.3em) rotate(21deg);
-  transform: translate(-0.9em, 0.3em) rotate(21deg);
-}
-.playingCards.rotateHand ul.hand li:nth-child(9) {
-  -moz-transform: translate(-1.3em, 0.6em) rotate(30deg);
-  -webkit-transform: translate(-1.3em, 0.6em) rotate(30deg);
-  -o-transform: translate(-1.3em, 0.6em) rotate(30deg);
-  transform: translate(-1.3em, 0.6em) rotate(30deg);
-}
-.playingCards.rotateHand ul.hand li:nth-child(10) {
-  -moz-transform: translate(-1.7em, 1em) rotate(39deg);
-  -webkit-transform: translate(-1.7em, 1em) rotate(39deg);
-  -o-transform: translate(-1.7em, 1em) rotate(39deg);
-  transform: translate(-1.7em, 1em) rotate(39deg);
+.hand3 {
+  grid-area: 3 / 10 / 10 / 11;
 }

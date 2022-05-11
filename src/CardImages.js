@@ -104,13 +104,21 @@ export function MapImageToCard(props) {
 
 export function CreateCardImage({ Hand, playerNumber }) {
   let playerNumberforClass = "hand" + playerNumber;
+
   return (
     <ul id="hand" className={playerNumberforClass}>
       {Hand.map((Card, index) => {
         let cardName = "Card" + Card.suit + Card.value;
         let Cards = svgImages[cardName];
-        return <Cards className="card" key={index + 1} />;
+        return (
+          <Cards
+            className={["cardH" + playerNumber, "card"].join(" ")}
+            key={index + 1}
+            onClick={()=>{console.log("Nimacc")}}
+          />
+        );
       })}
     </ul>
   );
 }
+

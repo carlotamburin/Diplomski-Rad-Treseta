@@ -17,5 +17,5 @@ export default class Hand {
     }
   }
 
-  removeCardFromHand(playerCard) {}
+  // removeCardFromHand(playerCard) {}
 }
