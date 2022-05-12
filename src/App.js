@@ -8,6 +8,7 @@ import { takeSeat } from "./gameRules.js";
 import { PlayGame } from "./PlayGame.js";
 
 function App() {
+  //Novi branch
   const [deck, setDeck] = useState(new Deck());
   deck.shuffler();
   const [player1, setPlayer1] = useState(new Hand(deck.cards));
