@@ -1,4 +1,7 @@
 import React from "react";
+import { useEffect, useState, useRef, useContext } from "react";
+import { UserContext } from "./App.js";
+
 //dinari
 import { ReactComponent as CardDACE } from "./Cards/clubs_ace.svg";
 import { ReactComponent as CardD2 } from "./Cards/clubs_2.svg";
@@ -91,6 +94,7 @@ const svgImages = {
 export function MapImageToCard(props) {
   return (
     <div className="playingCards rotateHand">
+      {/* {console.log(Object.keys(props))} */}
       {Object.keys(props).map((hand, index) => (
         <CreateCardImage
           Hand={props[hand]}
@@ -103,7 +107,22 @@ export function MapImageToCard(props) {
 }
 
 export function CreateCardImage({ Hand, playerNumber }) {
+  let { value } = useContext(UserContext);
+  let isClicked = value[0];
+  let Clicked = value[1];
+
   let playerNumberforClass = "hand" + playerNumber;
+
+  const cardRef = useRef();
+
+  const onCardClick = () => {
+    let cardClassName = cardRef.current.className.baseVal.split(" ")[0];
+    if (cardClassName === "cardH4") {Clicked(true);
+    console.log("Player played a card")
+    }
+    
+
+  };
 
   return (
     <ul id="hand" className={playerNumberforClass}>
@@ -114,11 +133,13 @@ export function CreateCardImage({ Hand, playerNumber }) {
           <Cards
             className={["cardH" + playerNumber, "card"].join(" ")}
             key={index + 1}
-            onClick={()=>{console.log("Nimacc")}}
+            onClick={() => {
+              onCardClick();
+            }}
+            ref={cardRef}
           />
         );
       })}
     </ul>
   );
 }
-

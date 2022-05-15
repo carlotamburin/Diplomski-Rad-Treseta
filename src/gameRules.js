@@ -1,6 +1,9 @@
 import sample from "lodash/sample.js";
 import shuffle from "lodash/shuffle.js";
 import Game from "./gameTrack.js";
+import { useContext } from "react";
+import { UserContext } from "./App.js";
+import { reject } from "lodash";
 
 let TABLE_POSITION = { left: 1, up: 2, right: 1, down: 2 };
 const CARD_VALUE_MAP = {
@@ -25,22 +28,28 @@ export function takeSeat(...players) {
     Game.tableSet[players[i].position] = players[i];
   }
 }
+export function mapSittingToTable(...players) {
+  let playersPosition = [...players];
 
-// function lastTurnWinner(player1, player2, player3, player4) {
-//   let lastTurnWinner = {};
-//   for (let i = 0; i < arguments.length; i++) {
-//     const player = arguments[i];
-//     if (player.winner) {
-//       lastTurnWinner = Game.lastPlayer = player;
-//       return lastTurnWinner;
-//     }
-//   }
-// }
+  let sortOrder = ["up", "left", "right", "down"];
+  console.log("Before", playersPosition);
 
-export function playTurn(gameNumber, setGameNumber, ...players) {
+  playersPosition.sort(function (a, b) {
+    return sortOrder.indexOf(a.position) - sortOrder.indexOf(b.position);
+  });
+
+  console.log(playersPosition);
+}
+
+export async function PlayTurn(gameNumber, setGameNumber, ...players) {
   let cardsThrown = 0;
-
   let lastWinner = whoPlaysFirst(gameNumber, ...players);
+
+  let { value } = useContext(UserContext);
+  let isClicked = value[0];
+  let Clicked = value[1];
+
+  await WaitForUserClick(isClicked, Clicked);
 
   const { hand: lastTurnWinnerHand } = lastWinner;
 
@@ -53,12 +62,11 @@ export function playTurn(gameNumber, setGameNumber, ...players) {
 
   while (cardsThrown !== 4) {
     let secondPlayer = nextPlayer(Game.lastPlayer);
-    console.log("Second player je " + JSON.stringify(secondPlayer));
+    //console.log("Second player je " + JSON.stringify(secondPlayer));
     secondPlayer.currentCard = secondPlayer
       .playCard(sample(secondPlayer.hand))
       .shift();
     cardsThrown += 1;
-    console.log(secondPlayer.currentCard);
 
     lastWinner = winningCard(lastWinner, secondPlayer); //Pobjednik ostaje
     Game.lastPlayer = secondPlayer;
@@ -123,4 +131,19 @@ function whoPlaysFirst(gameNumber, ...players) {
 function nextTurn(gameNumber, setGameNumber, lastWinner) {
   Game.lastTurnWinner = lastWinner;
   setGameNumber(gameNumber + 1);
+}
+
+async function WaitForUserClick(isClicked, Clicked) {
+  console.log("U click checkeru sam");
+
+  var promise = new Promise((resolve, reject) => {
+    if (isClicked === true) {
+      resolve("Kliknuo si");
+    }
+    reject();
+  });
+  await promise.then((result) => {
+    console.log("Vrijednost isClicked je:" + isClicked);
+    Clicked(false);
+  });
 }

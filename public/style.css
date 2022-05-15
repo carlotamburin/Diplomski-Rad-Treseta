@@ -23,7 +23,7 @@ body {
   -webkit-border-radius: 0.3em;
   -khtml-border-radius: 0.3em;
   padding: 0.25em;
-  margin: -1.5em -1em -1.5em 0em;
+  margin: -1.5em -1em -1.5em 0em; /*This is important for card look on browser */
   text-align: center;
   font-size: 1.2em; /* @change: adjust this value to make bigger or smaller cards */
   font-weight: normal;

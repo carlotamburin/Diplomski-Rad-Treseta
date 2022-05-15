@@ -21,7 +21,6 @@ class Card {
   constructor(suit, value, image) {
     this.suit = suit;
     this.value = value;
-    this.image = image;
   }
 }
 

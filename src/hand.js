@@ -6,6 +6,7 @@ export default class Hand {
     this.position = "";
     this.currentCard = {};
     this.playerType = "";
+    this.typeOfPlayer = "";
   }
 
   playCard(playerCard) {
