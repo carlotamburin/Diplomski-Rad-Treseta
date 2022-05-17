@@ -1,5 +1,6 @@
 import sample from "lodash/sample.js";
 import shuffle from "lodash/shuffle.js";
+import { useEffect, useRef } from "react";
 import Game from "./gameTrack.js";
 import { useContext } from "react";
 import { UserContext } from "./App.js";
@@ -31,6 +32,7 @@ export function takeSeat(...players) {
 export function mapSittingToTable(...players) {
   let playersPosition = [...players];
 
+
   let sortOrder = ["up", "left", "right", "down"];
   console.log("Before", playersPosition);
 
@@ -44,6 +46,8 @@ export function mapSittingToTable(...players) {
 export async function PlayTurn(gameNumber, setGameNumber, ...players) {
   let cardsThrown = 0;
   let lastWinner = whoPlaysFirst(gameNumber, ...players);
+
+
 
   let { value } = useContext(UserContext);
   let isClicked = value[0];
@@ -62,7 +66,9 @@ export async function PlayTurn(gameNumber, setGameNumber, ...players) {
 
   while (cardsThrown !== 4) {
     let secondPlayer = nextPlayer(Game.lastPlayer);
+
     //console.log("Second player je " + JSON.stringify(secondPlayer));
+
     secondPlayer.currentCard = secondPlayer
       .playCard(sample(secondPlayer.hand))
       .shift();
@@ -73,7 +79,7 @@ export async function PlayTurn(gameNumber, setGameNumber, ...players) {
   }
   console.log("Pobjednicka karta je: ", lastWinner.currentCard);
 
-  nextTurn(gameNumber, setGameNumber, lastWinner);
+  nextTurn(lastWinner, ...players);
 }
 
 function winningCard(player1, player2) {
@@ -114,23 +120,22 @@ function nextPlayer(lastPlayer) {
   return Game.tableSet[val];
 }
 
-function whoPlaysFirst(gameNumber, ...players) {
-  if (gameNumber === 0) {
+function whoPlaysFirst(...players) {
+  if (Game.gameNumber === 0) {
     let firstPlaying = sample(players);
-    Game.lastPlayer = firstPlaying;
-
-    return firstPlaying;
+    firstPlaying.winner = true;
+    Game.whoPlayedFirst = firstPlaying;
   }
-
-  let nextFirstPlayer = Game.lastTurnWinner;
-  Game.lastPlayer = nextFirstPlayer;
-
-  return nextFirstPlayer;
+  let nextFirstPlayer = nextPlayer(Game.whoPlayedFirst);
+  nextFirstPlayer.winner = true;
+  Game.whoPlayedFirst = nextFirstPlayer;
 }
 
-function nextTurn(gameNumber, setGameNumber, lastWinner) {
-  Game.lastTurnWinner = lastWinner;
-  setGameNumber(gameNumber + 1);
+function nextTurn(lastWinner, ...players) {
+  for (const player of players) {
+    if (player !== lastWinner) player.winner = false;
+  }
+  Game.gameNumber += 1;
 }
 
 async function WaitForUserClick(isClicked, Clicked) {

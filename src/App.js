@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import { Deck } from "./deck.js";
 import { MapImageToCard } from "./CardImages.js";
 import Hand from "./hand.js";
@@ -7,6 +8,7 @@ import { takeSeat, mapSittingToTable } from "./gameRules.js";
 import PlayGame from "./PlayGame.js";
 
 export const UserContext = React.createContext(null);
+
 
 function App() {
   //Novi branch
@@ -22,6 +24,7 @@ function App() {
   useEffect(() => {
     takeSeat(player1, player2, player3, player4);
   }, []);
+
 
   //let order = mapSittingToTable(player1, player2, player3, player4);
 
@@ -47,6 +50,5 @@ function App() {
     </>
   );
 }
-
 export default App;
 //{PlayGame(player1, player2, player3, player4)}
