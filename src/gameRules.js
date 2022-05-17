@@ -45,11 +45,7 @@ export async function PlayTurn(gameNumber, setGameNumber, ...players) {
   let cardsThrown = 0;
   let lastWinner = whoPlaysFirst(gameNumber, ...players);
 
-  let { value } = useContext(UserContext);
-  let isClicked = value[0];
-  let Clicked = value[1];
-
-  await WaitForUserClick(isClicked, Clicked);
+  await useCustomHook();
 
   const { hand: lastTurnWinnerHand } = lastWinner;
 
@@ -133,8 +129,10 @@ function nextTurn(gameNumber, setGameNumber, lastWinner) {
   setGameNumber(gameNumber + 1);
 }
 
-async function WaitForUserClick(isClicked, Clicked) {
-  console.log("U click checkeru sam");
+async function useCustomHook() {
+  let { value } = useContext(UserContext);
+  let isClicked = value[0];
+  let Clicked = value[1];
 
   var promise = new Promise((resolve, reject) => {
     if (isClicked === true) {
@@ -145,5 +143,6 @@ async function WaitForUserClick(isClicked, Clicked) {
   await promise.then((result) => {
     console.log("Vrijednost isClicked je:" + isClicked);
     Clicked(false);
+    return isClicked;
   });
 }
