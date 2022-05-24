@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState, useRef, useContext } from "react";
-import { UserContext } from "./App.js";
+import { playerClickedContext } from "./App.js";
 
 //dinari
 import { ReactComponent as CardDACE } from "./Cards/clubs_ace.svg";
@@ -97,7 +97,7 @@ export function MapImageToCard(props) {
       {/* {console.log(Object.keys(props))} */}
       {Object.keys(props).map((hand, index) => (
         <CreateCardImage
-          Hand={props[hand]}
+          Hand={props[hand].hand}
           playerNumber={index + 1}
           key={index + 1}
         />
@@ -107,21 +107,17 @@ export function MapImageToCard(props) {
 }
 
 export function CreateCardImage({ Hand, playerNumber }) {
-  let { value } = useContext(UserContext);
-  let isClicked = value[0];
-  let Clicked = value[1];
+  const cardRef = useRef();
+  const { playerPlayed, setPlayerPlayed } = useContext(playerClickedContext);
 
   let playerNumberforClass = "hand" + playerNumber;
 
-  const cardRef = useRef();
-
   const onCardClick = () => {
     let cardClassName = cardRef.current.className.baseVal.split(" ")[0];
-    if (cardClassName === "cardH4") {Clicked(true);
-    console.log("Player played a card")
+    if (cardClassName === "cardH4") {
+      setPlayerPlayed(true);
+      console.log("Player played a card");
     }
-    
-
   };
 
   return (

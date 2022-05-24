@@ -1,9 +1,6 @@
 import sample from "lodash/sample.js";
 import shuffle from "lodash/shuffle.js";
 import Game from "./gameTrack.js";
-import { useContext } from "react";
-import { UserContext } from "./App.js";
-import { reject } from "lodash";
 
 let TABLE_POSITION = { left: 1, up: 2, right: 1, down: 2 };
 const CARD_VALUE_MAP = {
@@ -24,6 +21,8 @@ export function takeSeat(...players) {
 
   for (let i = 0; i < players.length; i++) {
     players[i].position = table.splice(0, 1).shift();
+    if (players[i].position === "down") players[i].typeOfPlayer = "human";
+    else players[i].typeOfPlayer = "AI";
     players[i].team = TABLE_POSITION[players[i].position];
     Game.tableSet[players[i].position] = players[i];
   }
@@ -32,37 +31,50 @@ export function mapSittingToTable(...players) {
   let playersPosition = [...players];
 
   let sortOrder = ["up", "left", "right", "down"];
-  console.log("Before", playersPosition);
 
   playersPosition.sort(function (a, b) {
     return sortOrder.indexOf(a.position) - sortOrder.indexOf(b.position);
   });
 
-  console.log(playersPosition);
+  return playersPosition;
 }
 
-export async function PlayTurn(gameNumber, setGameNumber, ...players) {
+export async function PlayTurn(
+  gameNumber,
+  setGameNumber,
+  playerPlayed,
+  setPlayerPlayed,
+  ...players
+) {
   let cardsThrown = 0;
   let lastWinner = whoPlaysFirst(gameNumber, ...players);
-
-  await useCustomHook();
-
   const { hand: lastTurnWinnerHand } = lastWinner;
+  console.log(lastWinner);
 
-  lastWinner.currentCard = lastWinner
-    .playCard(sample(lastTurnWinnerHand))
-    .shift();
+  if (isPlayerTurn(lastWinner))
+    await waitUserClick(playerPlayed, setPlayerPlayed);
+  else {
+    lastWinner.currentCard = lastWinner
+      .playCard(sample(lastTurnWinnerHand))
+      .shift();
+    console.log("PLayer played a card:", lastWinner);
+  }
+
   Game.winningSuit = lastWinner.currentCard.suit;
   cardsThrown += 1;
-  console.log(lastWinner.currentCard);
 
   while (cardsThrown !== 4) {
     let secondPlayer = nextPlayer(Game.lastPlayer);
-    //console.log("Second player je " + JSON.stringify(secondPlayer));
-    secondPlayer.currentCard = secondPlayer
-      .playCard(sample(secondPlayer.hand))
-      .shift();
+    if (isPlayerTurn(secondPlayer))
+      await waitUserClick(playerPlayed, setPlayerPlayed);
+    else {
+      secondPlayer.currentCard = secondPlayer
+        .playCard(sample(secondPlayer.hand))
+        .shift();
+      console.log("PLayer played a card:", secondPlayer);
+    }
     cardsThrown += 1;
+    console.log(cardsThrown);
 
     lastWinner = winningCard(lastWinner, secondPlayer); //Pobjednik ostaje
     Game.lastPlayer = secondPlayer;
@@ -126,23 +138,27 @@ function whoPlaysFirst(gameNumber, ...players) {
 
 function nextTurn(gameNumber, setGameNumber, lastWinner) {
   Game.lastTurnWinner = lastWinner;
+  console.log("U kraju sam");
   setGameNumber(gameNumber + 1);
 }
 
-async function useCustomHook() {
-  let { value } = useContext(UserContext);
-  let isClicked = value[0];
-  let Clicked = value[1];
-
+async function waitUserClick(playerPlayed, setPlayerPlayed) {
   var promise = new Promise((resolve, reject) => {
-    if (isClicked === true) {
+    if (playerPlayed === true) {
       resolve("Kliknuo si");
     }
-    reject();
   });
-  await promise.then((result) => {
-    console.log("Vrijednost isClicked je:" + isClicked);
-    Clicked(false);
-    return isClicked;
-  });
+  await promise
+    .then((result) => {
+      console.log("Vrijednost isClicked je:" + playerPlayed);
+      setPlayerPlayed(false);
+    })
+    .catch(() => {
+      console.log("ERROR");
+    });
+}
+
+function isPlayerTurn(player) {
+  if (player.typeOfPlayer === "human") return true;
+  else return false;
 }
