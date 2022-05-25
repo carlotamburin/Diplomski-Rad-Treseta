@@ -1,6 +1,8 @@
 import sample from "lodash/sample.js";
 import shuffle from "lodash/shuffle.js";
 import Game from "./gameTrack.js";
+import {CLICK} from "./CardImages.js"
+
 
 let TABLE_POSITION = { left: 1, up: 2, right: 1, down: 2 };
 const CARD_VALUE_MAP = {
@@ -144,9 +146,11 @@ function nextTurn(gameNumber, setGameNumber, lastWinner) {
 
 async function waitUserClick(playerPlayed, setPlayerPlayed) {
   var promise = new Promise((resolve, reject) => {
-    if (playerPlayed === true) {
-      resolve("Kliknuo si");
-    }
+    // if (playerPlayed === true) {
+    //   resolve("Kliknuo si");
+    // }
+    CLICK.once("clicked", resolve);
+
   });
   await promise
     .then((result) => {
