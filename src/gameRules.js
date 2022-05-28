@@ -1,8 +1,7 @@
 import sample from "lodash/sample.js";
 import shuffle from "lodash/shuffle.js";
 import Game from "./gameTrack.js";
-import {CLICK} from "./CardImages.js"
-
+import { CLICK } from "./CardImages.js";
 
 let TABLE_POSITION = { left: 1, up: 2, right: 1, down: 2 };
 const CARD_VALUE_MAP = {
@@ -42,51 +41,53 @@ export function mapSittingToTable(...players) {
 }
 
 export async function PlayTurn(
+  lastWinner,
+  secondPlayer,
+  setsecondPlayer,
+  cardsPlayed,
+  setcardsPlayed,
   gameNumber,
   setGameNumber,
   playerPlayed,
-  setPlayerPlayed,
-  ...players
+  setPlayerPlayed
 ) {
-  let cardsThrown = 0;
-  let lastWinner = whoPlaysFirst(gameNumber, ...players);
   const { hand: lastTurnWinnerHand } = lastWinner;
-  console.log(lastWinner);
 
-  if (isPlayerTurn(lastWinner))
-    await waitUserClick(playerPlayed, setPlayerPlayed);
-  else {
-    lastWinner.currentCard = lastWinner
-      .playCard(sample(lastTurnWinnerHand))
-      .shift();
-    console.log("PLayer played a card:", lastWinner);
-  }
-
-  Game.winningSuit = lastWinner.currentCard.suit;
-  cardsThrown += 1;
-
-  while (cardsThrown !== 4) {
-    let secondPlayer = nextPlayer(Game.lastPlayer);
-    if (isPlayerTurn(secondPlayer))
+  if (cardsPlayed === 0) {
+    if (isPlayerTurn(lastWinner)) {
       await waitUserClick(playerPlayed, setPlayerPlayed);
-    else {
+      setcardsPlayed(cardsPlayed + 1);
+      console.log("Waiting for player");
+    } else {
+      lastWinner.currentCard = lastWinner
+        .playCard(sample(lastTurnWinnerHand))
+        .shift();
+      setcardsPlayed(cardsPlayed + 1);
+
+      console.log("PLayer played a card:", lastWinner);
+    }
+    Game.winningSuit = lastWinner.currentCard.suit;
+    Game.lastPlayer = lastWinner;
+  }
+  //While
+  else {
+    if (isPlayerTurn(secondPlayer)) {
+      await waitUserClick(playerPlayed, setPlayerPlayed);
+      setcardsPlayed(cardsPlayed + 1);
+      console.log("Waiting for player");
+    } else {
       secondPlayer.currentCard = secondPlayer
         .playCard(sample(secondPlayer.hand))
         .shift();
+      setcardsPlayed(cardsPlayed + 1);
+
       console.log("PLayer played a card:", secondPlayer);
     }
-    cardsThrown += 1;
-    console.log(cardsThrown);
-
-    lastWinner = winningCard(lastWinner, secondPlayer); //Pobjednik ostaje
-    Game.lastPlayer = secondPlayer;
   }
-  console.log("Pobjednicka karta je: ", lastWinner.currentCard);
-
-  nextTurn(gameNumber, setGameNumber, lastWinner);
+  Game.lastPlayer = lastWinner; 
 }
 
-function winningCard(player1, player2) {
+export function winningCard(player1, player2) {
   const { currentCard: player1Card } = player1;
   const { currentCard: player2Card } = player2;
 
@@ -109,7 +110,7 @@ function winningCard(player1, player2) {
   }
 }
 
-function nextPlayer(lastPlayer) {
+export function nextPlayer(lastPlayer) {
   let lastPlayerPosition = lastPlayer.position;
   let table = Object.keys(TABLE_POSITION);
   let tableLen = Object.keys(TABLE_POSITION).length;
@@ -124,7 +125,7 @@ function nextPlayer(lastPlayer) {
   return Game.tableSet[val];
 }
 
-function whoPlaysFirst(gameNumber, ...players) {
+export function whoPlaysFirst(gameNumber, ...players) {
   if (gameNumber === 0) {
     let firstPlaying = sample(players);
     Game.lastPlayer = firstPlaying;
@@ -138,7 +139,7 @@ function whoPlaysFirst(gameNumber, ...players) {
   return nextFirstPlayer;
 }
 
-function nextTurn(gameNumber, setGameNumber, lastWinner) {
+export function nextTurn(gameNumber, setGameNumber, lastWinner) {
   Game.lastTurnWinner = lastWinner;
   console.log("U kraju sam");
   setGameNumber(gameNumber + 1);
@@ -146,11 +147,10 @@ function nextTurn(gameNumber, setGameNumber, lastWinner) {
 
 async function waitUserClick(playerPlayed, setPlayerPlayed) {
   var promise = new Promise((resolve, reject) => {
-    // if (playerPlayed === true) {
-    //   resolve("Kliknuo si");
-    // }
-    CLICK.once("clicked", resolve);
-
+    if (playerPlayed === true) {
+      resolve("Kliknuo si");
+    }
+    //CLICK.once("clicked", resolve);
   });
   await promise
     .then((result) => {

@@ -118,8 +118,8 @@ export function CreateCardImage({ Hand, playerNumber }) {
   const onCardClick = () => {
     let cardClassName = cardRef.current.className.baseVal.split(" ")[0];
     if (cardClassName === "cardH4") {
-      //setPlayerPlayed(true);
-      CLICK.emit("clicked");
+      setPlayerPlayed(true);
+      //CLICK.emit("clicked");
       console.log("Player played a card");
     }
   };
