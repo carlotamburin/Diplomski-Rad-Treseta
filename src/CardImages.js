@@ -1,7 +1,6 @@
 import React from "react";
 import { useEffect, useState, useRef, useContext } from "react";
 import { playerClickedContext } from "./App.js";
-import EventEmitter from "eventemitter3";
 
 //dinari
 import { ReactComponent as CardDACE } from "./Cards/clubs_ace.svg";
@@ -92,8 +91,6 @@ const svgImages = {
   CardSKG,
 };
 
-export const CLICK = new EventEmitter();
-
 export function MapImageToCard(props) {
   return (
     <div className="playingCards rotateHand">
@@ -119,7 +116,6 @@ export function CreateCardImage({ Hand, playerNumber }) {
     let cardClassName = cardRef.current.className.baseVal.split(" ")[0];
     if (cardClassName === "cardH4") {
       setPlayerPlayed(true);
-      //CLICK.emit("clicked");
       console.log("Player played a card");
     }
   };

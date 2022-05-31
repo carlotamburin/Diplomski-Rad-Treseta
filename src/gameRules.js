@@ -1,7 +1,6 @@
 import sample from "lodash/sample.js";
 import shuffle from "lodash/shuffle.js";
 import Game from "./gameTrack.js";
-import { CLICK } from "./CardImages.js";
 
 let TABLE_POSITION = { left: 1, up: 2, right: 1, down: 2 };
 const CARD_VALUE_MAP = {
@@ -41,6 +40,10 @@ export function mapSittingToTable(...players) {
 }
 
 export async function PlayTurn(
+  lastPlayer,
+  setLastPlayer,
+  winningSuit,
+  setWiningSuit,
   lastWinner,
   secondPlayer,
   setsecondPlayer,
@@ -51,40 +54,42 @@ export async function PlayTurn(
   playerPlayed,
   setPlayerPlayed
 ) {
+
+
   const { hand: lastTurnWinnerHand } = lastWinner;
 
   if (cardsPlayed === 0) {
     if (isPlayerTurn(lastWinner)) {
       await waitUserClick(playerPlayed, setPlayerPlayed);
       setcardsPlayed(cardsPlayed + 1);
-      console.log("Waiting for player");
+      console.log("Waiting for last player");
     } else {
       lastWinner.currentCard = lastWinner
         .playCard(sample(lastTurnWinnerHand))
         .shift();
       setcardsPlayed(cardsPlayed + 1);
 
-      console.log("PLayer played a card:", lastWinner);
+      console.log("Last player: played a card:", lastWinner);
     }
-    Game.winningSuit = lastWinner.currentCard.suit;
-    Game.lastPlayer = lastWinner;
+    setWiningSuit(lastWinner.currentCard.suit);
+    setLastPlayer(lastWinner);
   }
   //While
   else {
     if (isPlayerTurn(secondPlayer)) {
       await waitUserClick(playerPlayed, setPlayerPlayed);
       setcardsPlayed(cardsPlayed + 1);
-      console.log("Waiting for player");
+      console.log("Waiting for second player");
     } else {
       secondPlayer.currentCard = secondPlayer
         .playCard(sample(secondPlayer.hand))
         .shift();
       setcardsPlayed(cardsPlayed + 1);
 
-      console.log("PLayer played a card:", secondPlayer);
+      console.log("Second player: played a card:", secondPlayer);
     }
+    setLastPlayer(secondPlayer);
   }
-  Game.lastPlayer = lastWinner; 
 }
 
 export function winningCard(player1, player2) {
@@ -125,18 +130,23 @@ export function nextPlayer(lastPlayer) {
   return Game.tableSet[val];
 }
 
-export function whoPlaysFirst(gameNumber, ...players) {
-  if (gameNumber === 0) {
-    let firstPlaying = sample(players);
-    Game.lastPlayer = firstPlaying;
-
-    return firstPlaying;
-  }
-
-  let nextFirstPlayer = Game.lastTurnWinner;
-  Game.lastPlayer = nextFirstPlayer;
+export function whoPlaysFirst(
+  gameNumber,
+  lastWinner,
+  setlastPlayer,
+  ...players
+) {
+  let nextFirstPlayer = lastWinner;
+  setlastPlayer(nextFirstPlayer);
 
   return nextFirstPlayer;
+}
+
+export function whoPlaysFirstDefault(player1, player2, player3, player4) {
+  let players = [player1, player2, player3, player4];
+  let firstPlaying = sample(players);
+
+  return firstPlaying;
 }
 
 export function nextTurn(gameNumber, setGameNumber, lastWinner) {
@@ -150,7 +160,7 @@ async function waitUserClick(playerPlayed, setPlayerPlayed) {
     if (playerPlayed === true) {
       resolve("Kliknuo si");
     }
-    //CLICK.once("clicked", resolve);
+   
   });
   await promise
     .then((result) => {
@@ -163,6 +173,7 @@ async function waitUserClick(playerPlayed, setPlayerPlayed) {
 }
 
 function isPlayerTurn(player) {
+
   if (player.typeOfPlayer === "human") return true;
   else return false;
 }

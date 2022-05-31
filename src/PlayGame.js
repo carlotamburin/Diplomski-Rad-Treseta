@@ -5,6 +5,7 @@ import { whoPlaysFirst } from "./gameRules.js";
 import { winningCard } from "./gameRules.js";
 import { nextPlayer } from "./gameRules.js";
 import Game from "./gameTrack.js";
+import { whoPlaysFirstDefault } from "./gameRules.js";
 
 export default function PlayGame({
   player1,
@@ -14,22 +15,27 @@ export default function PlayGame({
   playerPlayed,
   setPlayerPlayed,
 }) {
+  const randomFirstPlayer = whoPlaysFirstDefault(
+    player1,
+    player2,
+    player3,
+    player4
+  );
   const [gameNumber, setGameNumber] = useState(0);
   const [cardsPlayed, setcardsPlayed] = useState(0);
-  const [lastwinner, setlastwinner] = useState();
+  const [lastwinner, setlastwinner] = useState(randomFirstPlayer);
   const [secondPlayer, setsecondPlayer] = useState();
+  const [lastPlayer, setlastPlayer] = useState();
+  const [winningSuit, setwinningSuit] = useState();
+  const [secondPlayerBlocker, setSecondPlayerBlocker] = useState(0);
 
   useEffect(() => {
-    let players = [player1, player2, player3, player4];
-
-    setlastwinner(whoPlaysFirst(gameNumber, ...players));
-
     console.log("1");
-  }, [gameNumber, lastwinner, player1, player2, player3, player4]);
-
-  useEffect(() => {
-    console.log("2");
     PlayTurn(
+      lastPlayer,
+      setlastPlayer,
+      winningSuit,
+      setwinningSuit,
       lastwinner,
       secondPlayer,
       setsecondPlayer,
@@ -40,15 +46,20 @@ export default function PlayGame({
       playerPlayed,
       setPlayerPlayed
     );
-    console.log(Game.lastPlayer)
-    setsecondPlayer(nextPlayer(Game.lastPlayer));
-    console.log(secondPlayer)
-    console.log("Nakon set second player");
+
+    if (cardsPlayed !== 0 && secondPlayerBlocker === 0) {
+      setsecondPlayer(nextPlayer(lastPlayer));
+      console.log("Nakon set second player");
+      console.log("Broj odigranih karata", cardsPlayed);
+      console.log("Second player is:", secondPlayer);
+
+      if (cardsPlayed === 1) setSecondPlayerBlocker(1);
+    }
     if (cardsPlayed > 1) {
       setlastwinner(winningCard(lastwinner, secondPlayer)); //Pobjednik ostaje
+      setSecondPlayerBlocker(0);
       console.log("Best of 2 cards");
     }
-    Game.lastPlayer = secondPlayer;
     if (cardsPlayed === 4) {
       nextTurn(gameNumber, setGameNumber, lastwinner);
       console.log("Sljedeci turn je");
@@ -61,4 +72,14 @@ export default function PlayGame({
     secondPlayer,
     setPlayerPlayed,
   ]);
+
+  useEffect(() => {
+    let players = [player1, player2, player3, player4];
+
+    setlastwinner(
+      whoPlaysFirst(gameNumber, lastwinner, setlastPlayer, ...players)
+    );
+
+    console.log("2");
+  }, [gameNumber]);
 }

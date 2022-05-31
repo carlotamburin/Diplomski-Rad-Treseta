@@ -5,6 +5,7 @@ export default class Game extends React.Component {
   static team1Points = 0;
   static team2Points = 0;
   static lastPlayer = "";
+  static secondPlayer = "";
   static tableSet = {};
   static lastTurnWinner = "";
 
