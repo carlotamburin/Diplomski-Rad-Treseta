@@ -1,6 +1,8 @@
 import React from "react";
 import { useEffect, useState, useRef, useContext } from "react";
 import { playerClickedContext } from "./App.js";
+import chunk from "lodash/chunk.js";
+import EventEmitter from "eventemitter3";
 
 //dinari
 import { ReactComponent as CardDACE } from "./Cards/clubs_ace.svg";
@@ -106,16 +108,30 @@ export function MapImageToCard(props) {
   );
 }
 
+export const EE = new EventEmitter();
+
 export function CreateCardImage({ Hand, playerNumber }) {
-  const cardRef = useRef();
+  const cardRef = useRef([]);
   const { playerPlayed, setPlayerPlayed } = useContext(playerClickedContext);
 
   let playerNumberforClass = "hand" + playerNumber;
 
-  const onCardClick = () => {
-    let cardClassName = cardRef.current.className.baseVal.split(" ")[0];
+  const onCardClick = (event) => {
+    let cardClassName = event.currentTarget.className.baseVal.split(" ")[0];
+    let id = event.currentTarget.id;
+
+    //Getting card info
+
+    let chunks = chunk(id, 5);
+    let cardNumber = chunks[1].join("");
+    let cardSuit = chunks[0][chunks[0].length - 1];
+
+    let cardValues = { suit: cardSuit, value: cardNumber };
+
     if (cardClassName === "cardH4") {
       setPlayerPlayed(true);
+      EE.emit("click", cardValues);
+
       console.log("Player played a card");
     }
   };
@@ -128,11 +144,10 @@ export function CreateCardImage({ Hand, playerNumber }) {
         return (
           <Cards
             className={["cardH" + playerNumber, "card"].join(" ")}
+            id={cardName}
             key={index + 1}
-            onClick={() => {
-              onCardClick();
-            }}
-            ref={cardRef}
+            onClick={onCardClick}
+            ref={(element) => cardRef.current.push(element)}
           />
         );
       })}

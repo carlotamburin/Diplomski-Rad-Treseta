@@ -24,7 +24,6 @@ function App() {
   const value = { playerPlayed, setPlayerPlayed };
 
   // initial load
-
   takeSeat(player1, player2, player3, player4);
 
   let playersInOrder = mapSittingToTable(player1, player2, player3, player4);
