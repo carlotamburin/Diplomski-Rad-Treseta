@@ -23,13 +23,14 @@ export default function PlayGame({
   );
   const setSecondPlayerTurns = [1, 3, 5];
   const playCardTurns = [0, 2, 4, 6];
+  let humanPlayed = false;
 
   //states
   const [gameNumber, setGameNumber] = useState(0);
   const [cardsPlayed, setcardsPlayed] = useState(0);
   const [lastwinner, setlastwinner] = useState(randomFirstPlayer);
   const [secondPlayer, setsecondPlayer] = useState();
-  const [lastPlayer, setlastPlayer] = useState();
+  const [lastPlayer, setlastPlayer] = useState(randomFirstPlayer);
   const [winningSuit, setwinningSuit] = useState();
   const [numberOfRenders, setnumberOfRenders] = useState(0);
   const [lastWinnerCurrCard, setLastWinnerCurrCard] = useState();
@@ -38,19 +39,19 @@ export default function PlayGame({
   useEffect(() => {
     console.log("RENDER:", numberOfRenders);
     console.log("Cards played:", cardsPlayed);
+    console.log("SECOND PLAYER IS :", secondPlayer);
+    console.log("LAST WINNER IS :", lastwinner);
+    //console.log("LAST Player IS :",lastPlayer);
+
     setnumberOfRenders(numberOfRenders + 1);
     if ([3, 4, 6].includes(numberOfRenders)) {
-      setlastwinner(winningCard(lastwinner, secondPlayer, winningSuit)); //Pobjednik ostaje u lastWinneru
-      // Tu je negdi bug
+      setlastwinner(winningCard(lastwinner, secondPlayer, winningSuit)); //Last winner/ second player zamini sa curr card Ali triba vracati player object
       console.log("Comparing winner");
     }
 
     if (playCardTurns.includes(numberOfRenders)) {
       PlayTurn(
-        lastWinnerCurrCard,
-        setLastWinnerCurrCard,
-        secondPlayerCurrentCard,
-        setsecondPlayerCurrentCard,
+        setlastwinner,
         lastPlayer,
         setlastPlayer,
         winningSuit,
@@ -88,7 +89,7 @@ export default function PlayGame({
       setnumberOfRenders(0); //Checkiraj ovo
       console.log("Sljedeci turn je");
     }
-  }, [gameNumber, lastwinner, playerPlayed, secondPlayer]);
+  }, [cardsPlayed, gameNumber, lastwinner, playerPlayed, secondPlayer]);
 }
 
 //Jer kad su 3 odigrane znaci da su 4 zapravo

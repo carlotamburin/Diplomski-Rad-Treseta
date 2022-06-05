@@ -112,7 +112,6 @@ export const EE = new EventEmitter();
 
 export function CreateCardImage({ Hand, playerNumber }) {
   const cardRef = useRef([]);
-  const { playerPlayed, setPlayerPlayed } = useContext(playerClickedContext);
 
   let playerNumberforClass = "hand" + playerNumber;
 
@@ -128,12 +127,10 @@ export function CreateCardImage({ Hand, playerNumber }) {
 
     let cardValues = { suit: cardSuit, value: cardNumber };
 
-    if (cardClassName === "cardH4") {
-      setPlayerPlayed(true);
-      EE.emit("click", cardValues);
+    //setPlayerPlayed(true);
+    EE.emit("click", cardValues, cardClassName); // Dodaj jos jedan argument pa proslijedi i klasu i setPlayerPLayed  vrsi u then u gameRules
 
-      console.log("Player played a card");
-    }
+    console.log("Player played a card");
   };
 
   return (

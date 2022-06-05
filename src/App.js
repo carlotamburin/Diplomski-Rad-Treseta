@@ -21,7 +21,7 @@ function App() {
 
   // Is player Played
   const [playerPlayed, setPlayerPlayed] = useState(false);
-  const value = { playerPlayed, setPlayerPlayed };
+
 
   // initial load
   takeSeat(player1, player2, player3, player4);
@@ -30,9 +30,7 @@ function App() {
 
   return (
     <>
-      <playerClickedContext.Provider value={value}>
-        <MapImageToCard {...playersInOrder} />
-      </playerClickedContext.Provider>
+      <MapImageToCard {...playersInOrder} />
       <PlayGame
         player1={player1}
         player2={player2}

@@ -41,10 +41,7 @@ export function mapSittingToTable(...players) {
 }
 
 export async function PlayTurn(
-  lastWinnerCurrCard,
-  setLastWinnerCurrCard,
-  secondPlayerCurrentCard,
-  setsecondPlayerCurrentCard,
+  setlastwinner,
   lastPlayer,
   setLastPlayer,
   winningSuit,
@@ -61,50 +58,57 @@ export async function PlayTurn(
 ) {
   const { hand: lastTurnWinnerHand } = lastWinner;
   console.log("Usao u playCard");
+  let winningCard;
+  let playedCard;
+  let humanPlayed;
 
   if (cardsPlayed === 0) {
     if (isPlayerTurn(lastWinner)) {
       let clickedCard = await waitUserClick(playerPlayed);
-      console.log(clickedCard);
-      setcardsPlayed(cardsPlayed + 1);
-      setPlayerPlayed(false);
+      humanPlayed = true;
+      winningCard = lastWinner.playCard(clickedCard.arg1).shift();
     } else {
-      setLastWinnerCurrCard(
-        lastWinner.playCard(sample(lastTurnWinnerHand)).shift()
-      );
-      setcardsPlayed(cardsPlayed + 1);
+      winningCard = lastWinner.playCard(sample(lastTurnWinnerHand)).shift();
       console.log("Last player: played a card:", lastWinner);
     }
-    console.log(lastWinner.currentCard);
-    setWiningSuit(lastWinner.currentCard.suit);
-    setLastPlayer(lastWinner);
+    setcardsPlayed(cardsPlayed + 1);
+    setWiningSuit(winningCard.suit);
+    setlastwinner((ev) => ({
+      ...ev,
+      currentCard: winningCard,
+    }));
   }
   //While
   else {
     if (isPlayerTurn(secondPlayer)) {
       let clickedCard = await waitUserClick(playerPlayed);
-      console.log(clickedCard);
-
-      setcardsPlayed(cardsPlayed + 1);
-      setPlayerPlayed(false);
-      console.log("Waiting for second player");
+      humanPlayed = true;
+      playedCard = secondPlayer.playCard(clickedCard.arg1).shift();
     } else {
-      setsecondPlayerCurrentCard(
-        secondPlayer.playCard(sample(secondPlayer.hand)).shift()
-      );
-      setcardsPlayed(cardsPlayed + 1);
+      playedCard = secondPlayer.playCard(sample(secondPlayer.hand)).shift();
       console.log("Second player: played a card:", secondPlayer);
     }
+    setcardsPlayed(cardsPlayed + 1);
+    setsecondPlayer((ev) => ({
+      ...ev,
+      currentCard: playedCard,
+    }));
+
     setLastPlayer(secondPlayer);
   }
+  console.log("Na kraju sam PLAYTURNA");
+  // if (humanPlayed) return true;
+  // return false;
 }
 
 export function winningCard(player1, player2, winningSuit) {
   const { currentCard: player1Card } = player1;
   const { currentCard: player2Card } = player2;
 
+  console.log(player1);
+  console.log(player2);
+
   if (player1Card.suit === winningSuit) {
-    //Popravi ove class variable
     if (player2Card.suit !== player1Card.suit) {
       return player1;
     }
@@ -134,7 +138,6 @@ export function nextPlayer(lastPlayer) {
   // console.log("The next player position " + val);
   // console.log("The next player team: " + TABLE_POSITION[val]);
   // console.log("The last player position " + indexOfLastPLayer);
-
   return Game.tableSet[val];
 }
 
@@ -170,27 +173,15 @@ export function nextTurn(
 
 async function waitUserClick(playerPlayed) {
   return await new Promise((resolve, reject) => {
-    if (playerPlayed === true) {
-      EE.on("click", function listener(arg) {
-        console.log(arg);
-        resolve(arg);
-      });
-    }
+    //If cards played
+    EE.on("click", function listener(arg1, arg2) {
+      console.log("Human played a card!");
+      if (arg2 === "cardH4") resolve({ arg1, arg2 });
+    });
   });
-  //await promise
 }
 
 function isPlayerTurn(player) {
   if (player.typeOfPlayer === "human") return true;
   else return false;
 }
-
-// function playCard(player,type,setCard){
-
-//   if(type === "AI"){
-//     setCard(
-//       player.playCard(sample(player.hand)).shift()
-//     );
-//   }
-
-// }
