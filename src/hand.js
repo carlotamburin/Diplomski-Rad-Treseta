@@ -8,14 +8,31 @@ export default class Hand {
     this.typeOfPlayer = "";
   }
 
-  playCard(playerCard) {
-    for (const card of this.hand) {
-      if (card.suit === playerCard.suit && card.value === playerCard.value) {
-        const playerCard = this.hand.splice(this.hand.indexOf(card), 1);
-        return playerCard; //shift?
-      }
-    }
-  }
+  // playCard(playerCard) {
+  //   for (const card of this.hand) {
+  //     if (card.suit === playerCard.suit && card.value === playerCard.value) {
+  //       let playedCard = this.hand.splice(this.hand.indexOf(card), 1);
+  //       return playedCard; //shift?
+  //     }
+  //   }
+  // }
 
-  // removeCardFromHand(playerCard) {}
+  playCard(playerCard, setPlayer) {
+    let newArray = [];
+    let playedCard = this.hand.filter((card) => {
+      if (card.suit === playerCard.suit && card.value === playerCard.value) {
+        return card; //shift?
+      } else {
+        newArray.push(card);
+      }
+    });
+
+    setPlayer((prevState) => {
+      let player = Object.assign(prevState, prevState);
+      player.hand = newArray;
+
+      return player;
+    });
+    return playedCard.shift();
+  }
 }

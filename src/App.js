@@ -1,6 +1,5 @@
-import React, { useEffect, useState, createContext } from "react";
+import React, { useState, createContext } from "react";
 import { Deck } from "./deck.js";
-import { MapImageToCard } from "./CardImages.js";
 import Hand from "./hand.js";
 
 import { takeSeat, mapSittingToTable } from "./gameRules.js";
@@ -22,7 +21,6 @@ function App() {
   // Is player Played
   const [playerPlayed, setPlayerPlayed] = useState(false);
 
-
   // initial load
   takeSeat(player1, player2, player3, player4);
 
@@ -30,7 +28,6 @@ function App() {
 
   return (
     <>
-      <MapImageToCard {...playersInOrder} />
       <PlayGame
         player1={player1}
         player2={player2}
@@ -38,6 +35,7 @@ function App() {
         player4={player4}
         playerPlayed={playerPlayed}
         setPlayerPlayed={setPlayerPlayed}
+        playersInOrder={playersInOrder}
       />
     </>
   );

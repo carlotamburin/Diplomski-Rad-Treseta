@@ -2,6 +2,7 @@ import sample from "lodash/sample.js";
 import shuffle from "lodash/shuffle.js";
 import Game from "./gameTrack.js";
 import { EE } from "./CardImages.js";
+import Hand from "./hand.js";
 
 let TABLE_POSITION = { left: 1, up: 2, right: 1, down: 2 };
 const CARD_VALUE_MAP = {
@@ -51,62 +52,59 @@ export async function PlayTurn(
   setsecondPlayer,
   cardsPlayed,
   setcardsPlayed,
-  gameNumber,
-  setGameNumber,
-  playerPlayed,
-  setPlayerPlayed
+  playerPlayed
 ) {
   const { hand: lastTurnWinnerHand } = lastWinner;
   console.log("Usao u playCard");
   let winningCard;
   let playedCard;
-  let humanPlayed;
 
   if (cardsPlayed === 0) {
     if (isPlayerTurn(lastWinner)) {
       let clickedCard = await waitUserClick(playerPlayed);
-      humanPlayed = true;
-      winningCard = lastWinner.playCard(clickedCard.arg1).shift();
+      winningCard = lastWinner.playCard(clickedCard.arg1,setlastwinner);
+      console.log("Last player: played a card:", winningCard);
     } else {
-      winningCard = lastWinner.playCard(sample(lastTurnWinnerHand)).shift();
-      console.log("Last player: played a card:", lastWinner);
+      winningCard = lastWinner.playCard(sample(lastTurnWinnerHand),setlastwinner);
+      console.log("Last player: played a card:", winningCard);
     }
     setcardsPlayed(cardsPlayed + 1);
     setWiningSuit(winningCard.suit);
-    setlastwinner((ev) => ({
-      ...ev,
-      currentCard: winningCard,
-    }));
+    setlastwinner((prevState) => {
+      let player = Object.assign(prevState, prevState);
+      player.currentCard = winningCard;
+
+      return player;
+    });
   }
   //While
   else {
     if (isPlayerTurn(secondPlayer)) {
       let clickedCard = await waitUserClick(playerPlayed);
-      humanPlayed = true;
-      playedCard = secondPlayer.playCard(clickedCard.arg1).shift();
+      playedCard = secondPlayer.playCard(clickedCard.arg1,setsecondPlayer);
+      console.log("Second player: played a card:", playedCard);
     } else {
-      playedCard = secondPlayer.playCard(sample(secondPlayer.hand)).shift();
-      console.log("Second player: played a card:", secondPlayer);
+      playedCard = secondPlayer.playCard(sample(secondPlayer.hand),setsecondPlayer);
+      console.log("Second player: played a card:", playedCard);
     }
     setcardsPlayed(cardsPlayed + 1);
-    setsecondPlayer((ev) => ({
-      ...ev,
-      currentCard: playedCard,
-    }));
+
+    setsecondPlayer((prevState) => {
+      let player = Object.assign(prevState, prevState);
+      player.currentCard = playedCard;
+
+      return player;
+    });
 
     setLastPlayer(secondPlayer);
   }
   console.log("Na kraju sam PLAYTURNA");
-  // if (humanPlayed) return true;
-  // return false;
 }
 
 export function winningCard(player1, player2, winningSuit) {
   const { currentCard: player1Card } = player1;
   const { currentCard: player2Card } = player2;
-
-  console.log(player1);
-  console.log(player2);
+  console.log(" U winning cardu je");
 
   if (player1Card.suit === winningSuit) {
     if (player2Card.suit !== player1Card.suit) {
@@ -160,13 +158,7 @@ export function whoPlaysFirstDefault(player1, player2, player3, player4) {
   return firstPlaying;
 }
 
-export function nextTurn(
-  gameNumber,
-  setGameNumber,
-  lastWinner,
-  setcardsPlayed
-) {
-  setcardsPlayed(0);
+export function nextTurn(gameNumber, setGameNumber) {
   console.log("U kraju sam");
   setGameNumber(gameNumber + 1);
 }

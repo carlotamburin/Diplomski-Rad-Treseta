@@ -96,7 +96,7 @@ const svgImages = {
 export function MapImageToCard(props) {
   return (
     <div className="playingCards rotateHand">
-      {/* {console.log(Object.keys(props))} */}
+      {/* {console.log("Usao u CardImages")} */}
       {Object.keys(props).map((hand, index) => (
         <CreateCardImage
           Hand={props[hand].hand}

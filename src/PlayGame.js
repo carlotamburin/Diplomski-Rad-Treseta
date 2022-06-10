@@ -4,8 +4,8 @@ import { nextTurn } from "./gameRules.js";
 import { whoPlaysFirst } from "./gameRules.js";
 import { winningCard } from "./gameRules.js";
 import { nextPlayer } from "./gameRules.js";
-import Game from "./gameTrack.js";
 import { whoPlaysFirstDefault } from "./gameRules.js";
+import { MapImageToCard } from "./CardImages.js";
 
 export default function PlayGame({
   player1,
@@ -14,6 +14,7 @@ export default function PlayGame({
   player4,
   playerPlayed,
   setPlayerPlayed,
+  playersInOrder,
 }) {
   const randomFirstPlayer = whoPlaysFirstDefault(
     player1,
@@ -23,7 +24,6 @@ export default function PlayGame({
   );
   const setSecondPlayerTurns = [1, 3, 5];
   const playCardTurns = [0, 2, 4, 6];
-  let humanPlayed = false;
 
   //states
   const [gameNumber, setGameNumber] = useState(0);
@@ -33,8 +33,7 @@ export default function PlayGame({
   const [lastPlayer, setlastPlayer] = useState(randomFirstPlayer);
   const [winningSuit, setwinningSuit] = useState();
   const [numberOfRenders, setnumberOfRenders] = useState(0);
-  const [lastWinnerCurrCard, setLastWinnerCurrCard] = useState();
-  const [secondPlayerCurrentCard, setsecondPlayerCurrentCard] = useState();
+  const [lastTurn, setlastTurn] = useState(false);
 
   useEffect(() => {
     console.log("RENDER:", numberOfRenders);
@@ -43,8 +42,11 @@ export default function PlayGame({
     console.log("LAST WINNER IS :", lastwinner);
     //console.log("LAST Player IS :",lastPlayer);
 
+    if (numberOfRenders === 7) setlastTurn(true);
+    if (numberOfRenders === 0) setlastTurn(false);
+
     setnumberOfRenders(numberOfRenders + 1);
-    if ([3, 4, 6].includes(numberOfRenders)) {
+    if ([3, 5, 7].includes(numberOfRenders)) {
       setlastwinner(winningCard(lastwinner, secondPlayer, winningSuit)); //Last winner/ second player zamini sa curr card Ali triba vracati player object
       console.log("Comparing winner");
     }
@@ -61,10 +63,7 @@ export default function PlayGame({
         setsecondPlayer,
         cardsPlayed,
         setcardsPlayed,
-        gameNumber,
-        setGameNumber,
-        playerPlayed,
-        setPlayerPlayed
+        playerPlayed
       );
     }
 
@@ -75,7 +74,7 @@ export default function PlayGame({
     }
 
     let players = [player1, player2, player3, player4];
-    if (numberOfRenders === 6) {
+    if (numberOfRenders === 8) {
       console.log("Tko igra sljedeci next turn");
 
       setlastwinner(
@@ -83,13 +82,28 @@ export default function PlayGame({
       );
     }
 
-    if (numberOfRenders === 6) {
-      nextTurn(gameNumber, setGameNumber, lastwinner, setcardsPlayed);
-      setcardsPlayed(0);
+    if (numberOfRenders === 8) {
+      nextTurn(gameNumber, setGameNumber);
       setnumberOfRenders(0); //Checkiraj ovo
+      setcardsPlayed(0);
       console.log("Sljedeci turn je");
     }
-  }, [cardsPlayed, gameNumber, lastwinner, playerPlayed, secondPlayer]);
+  }, [
+    cardsPlayed,
+    gameNumber,
+    lastwinner,
+    playerPlayed,
+    secondPlayer,
+    lastTurn,
+    winningCard,
+    PlayTurn,
+    nextPlayer,
+    whoPlaysFirst,
+    nextTurn,
+  ]);
+
+  return <MapImageToCard {...playersInOrder} />;
 }
 
-//Jer kad su 3 odigrane znaci da su 4 zapravo
+//Bug, kada dode na turn 7 nakon compare winnera stane
+// Ne rerendera karte
