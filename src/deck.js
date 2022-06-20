@@ -1,5 +1,4 @@
 import shuffle from "lodash/shuffle";
-import React from "react";
 export const SUITS = ["D", "B", "K", "S"];
 export const VALUES = ["ACE", "2", "3", "4", "5", "6", "7", "JK", "KN", "KG"];
 

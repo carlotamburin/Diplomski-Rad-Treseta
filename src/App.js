@@ -1,14 +1,10 @@
-import React, { useState, createContext } from "react";
+import React, { useState } from "react";
 import { Deck } from "./deck.js";
 import Hand from "./hand.js";
 
 import { takeSeat, mapSittingToTable } from "./gameRules.js";
 import PlayGame from "./PlayGame.js";
 
-export const playerClickedContext = createContext({
-  playerPlayed: false,
-  setPlayerPlayed: () => {},
-});
 
 function App() {
   const [deck, setDeck] = useState(new Deck());
@@ -19,7 +15,7 @@ function App() {
   const [player4, setPlayer4] = useState(new Hand(deck.cards));
 
   // Is player Played
-  const [playerPlayed, setPlayerPlayed] = useState(false);
+
 
   // initial load
   takeSeat(player1, player2, player3, player4);
@@ -33,8 +29,6 @@ function App() {
         player2={player2}
         player3={player3}
         player4={player4}
-        playerPlayed={playerPlayed}
-        setPlayerPlayed={setPlayerPlayed}
         playersInOrder={playersInOrder}
       />
     </>

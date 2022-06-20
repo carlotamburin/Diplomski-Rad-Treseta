@@ -2,7 +2,7 @@ import sample from "lodash/sample.js";
 import shuffle from "lodash/shuffle.js";
 import Game from "./gameTrack.js";
 import { EE } from "./CardImages.js";
-import Hand from "./hand.js";
+import { isEqual } from "lodash";
 
 let TABLE_POSITION = { left: 1, up: 2, right: 1, down: 2 };
 const CARD_VALUE_MAP = {
@@ -43,16 +43,13 @@ export function mapSittingToTable(...players) {
 
 export async function PlayTurn(
   setlastwinner,
-  lastPlayer,
   setLastPlayer,
-  winningSuit,
   setWiningSuit,
   lastWinner,
   secondPlayer,
   setsecondPlayer,
   cardsPlayed,
-  setcardsPlayed,
-  playerPlayed
+  setcardsPlayed
 ) {
   const { hand: lastTurnWinnerHand } = lastWinner;
   console.log("Usao u playCard");
@@ -61,41 +58,48 @@ export async function PlayTurn(
 
   if (cardsPlayed === 0) {
     if (isPlayerTurn(lastWinner)) {
-      let clickedCard = await waitUserClick(playerPlayed);
-      winningCard = lastWinner.playCard(clickedCard.arg1,setlastwinner);
+      let clickedCard = await waitUserClick();
+      winningCard = lastWinner.playCard(clickedCard.arg1, setlastwinner);
       console.log("Last player: played a card:", winningCard);
     } else {
-      winningCard = lastWinner.playCard(sample(lastTurnWinnerHand),setlastwinner);
+      winningCard = lastWinner.playCard(
+        sample(lastTurnWinnerHand),
+        setlastwinner
+      );
       console.log("Last player: played a card:", winningCard);
     }
-    setcardsPlayed(cardsPlayed + 1);
+    setcardsPlayed((cardsPlayed) => {
+      return cardsPlayed + 1;
+    });
     setWiningSuit(winningCard.suit);
     setlastwinner((prevState) => {
       let player = Object.assign(prevState, prevState);
       player.currentCard = winningCard;
-
       return player;
     });
   }
   //While
   else {
     if (isPlayerTurn(secondPlayer)) {
-      let clickedCard = await waitUserClick(playerPlayed);
-      playedCard = secondPlayer.playCard(clickedCard.arg1,setsecondPlayer);
+      let clickedCard = await waitUserClick();
+      playedCard = secondPlayer.playCard(clickedCard.arg1, setsecondPlayer);
       console.log("Second player: played a card:", playedCard);
     } else {
-      playedCard = secondPlayer.playCard(sample(secondPlayer.hand),setsecondPlayer);
+      playedCard = secondPlayer.playCard(
+        sample(secondPlayer.hand),
+        setsecondPlayer
+      );
       console.log("Second player: played a card:", playedCard);
     }
-    setcardsPlayed(cardsPlayed + 1);
+    setcardsPlayed((cardsPlayed) => {
+      return cardsPlayed + 1;
+    });
 
     setsecondPlayer((prevState) => {
       let player = Object.assign(prevState, prevState);
       player.currentCard = playedCard;
-
       return player;
     });
-
     setLastPlayer(secondPlayer);
   }
   console.log("Na kraju sam PLAYTURNA");
@@ -139,12 +143,7 @@ export function nextPlayer(lastPlayer) {
   return Game.tableSet[val];
 }
 
-export function whoPlaysFirst(
-  gameNumber,
-  lastWinner,
-  setlastPlayer,
-  ...players
-) {
+export function whoPlaysFirst(lastWinner, setlastPlayer) {
   let nextFirstPlayer = lastWinner;
   setlastPlayer(nextFirstPlayer);
 
@@ -158,15 +157,17 @@ export function whoPlaysFirstDefault(player1, player2, player3, player4) {
   return firstPlaying;
 }
 
-export function nextTurn(gameNumber, setGameNumber) {
+export function nextTurn(setGameNumber) {
   console.log("U kraju sam");
-  setGameNumber(gameNumber + 1);
+  setGameNumber((gameNumber) => {
+    return gameNumber + 1;
+  });
 }
 
-async function waitUserClick(playerPlayed) {
+async function waitUserClick() {
   return await new Promise((resolve, reject) => {
     //If cards played
-    EE.on("click", function listener(arg1, arg2) {
+    EE.once("click", function listener(arg1, arg2) {
       console.log("Human played a card!");
       if (arg2 === "cardH4") resolve({ arg1, arg2 });
     });
@@ -176,4 +177,20 @@ async function waitUserClick(playerPlayed) {
 function isPlayerTurn(player) {
   if (player.typeOfPlayer === "human") return true;
   else return false;
+}
+
+export function handsAreEmpty(player) {
+  return player.cardsInHand() === 0;
+}
+
+export function deepCompareEquals(prevVal, currentVal) {
+  return isEqual(prevVal, currentVal);
+}
+
+export function useDeepCompareWithRef(value,prevValue) {
+  if (!deepCompareEquals(value, prevValue.current)) {
+    prevValue.current = value;
+  }
+
+  return prevValue.current;
 }

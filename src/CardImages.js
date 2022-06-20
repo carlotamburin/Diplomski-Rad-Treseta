@@ -1,6 +1,6 @@
 import React from "react";
-import { useEffect, useState, useRef, useContext } from "react";
-import { playerClickedContext } from "./App.js";
+import { useRef } from "react";
+
 import chunk from "lodash/chunk.js";
 import EventEmitter from "eventemitter3";
 
@@ -120,15 +120,13 @@ export function CreateCardImage({ Hand, playerNumber }) {
     let id = event.currentTarget.id;
 
     //Getting card info
-
     let chunks = chunk(id, 5);
     let cardNumber = chunks[1].join("");
     let cardSuit = chunks[0][chunks[0].length - 1];
 
     let cardValues = { suit: cardSuit, value: cardNumber };
 
-    //setPlayerPlayed(true);
-    EE.emit("click", cardValues, cardClassName); // Dodaj jos jedan argument pa proslijedi i klasu i setPlayerPLayed  vrsi u then u gameRules
+    EE.emit("click", cardValues, cardClassName);
 
     console.log("Player played a card");
   };

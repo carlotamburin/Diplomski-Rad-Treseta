@@ -6,16 +6,8 @@ export default class Hand {
     this.position = "";
     this.currentCard = {};
     this.typeOfPlayer = "";
+    this.setted=false;
   }
-
-  // playCard(playerCard) {
-  //   for (const card of this.hand) {
-  //     if (card.suit === playerCard.suit && card.value === playerCard.value) {
-  //       let playedCard = this.hand.splice(this.hand.indexOf(card), 1);
-  //       return playedCard; //shift?
-  //     }
-  //   }
-  // }
 
   playCard(playerCard, setPlayer) {
     let newArray = [];
@@ -34,5 +26,9 @@ export default class Hand {
       return player;
     });
     return playedCard.shift();
+  }
+
+  cardsInHand() {
+    return this.hand.length;
   }
 }
