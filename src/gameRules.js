@@ -49,14 +49,14 @@ export async function PlayTurn(
   secondPlayer,
   setsecondPlayer,
   cardsPlayed,
-  setcardsPlayed
+  setnextTurnFlag
 ) {
   const { hand: lastTurnWinnerHand } = lastWinner;
   console.log("Usao u playCard");
   let winningCard;
   let playedCard;
 
-  if (cardsPlayed === 0) {
+  if (cardsPlayed.current === 0) {
     if (isPlayerTurn(lastWinner)) {
       let clickedCard = await waitUserClick();
       winningCard = lastWinner.playCard(clickedCard.arg1, setlastwinner);
@@ -68,15 +68,9 @@ export async function PlayTurn(
       );
       console.log("Last player: played a card:", winningCard);
     }
-    setcardsPlayed((cardsPlayed) => {
-      return cardsPlayed + 1;
-    });
+    cardsPlayed.current += 1;
     setWiningSuit(winningCard.suit);
-    setlastwinner((prevState) => {
-      let player = Object.assign(prevState, prevState);
-      player.currentCard = winningCard;
-      return player;
-    });
+
   }
   //While
   else {
@@ -91,23 +85,19 @@ export async function PlayTurn(
       );
       console.log("Second player: played a card:", playedCard);
     }
-    setcardsPlayed((cardsPlayed) => {
-      return cardsPlayed + 1;
-    });
-
-    setsecondPlayer((prevState) => {
-      let player = Object.assign(prevState, prevState);
-      player.currentCard = playedCard;
-      return player;
-    });
+    cardsPlayed.current += 1;
     setLastPlayer(secondPlayer);
   }
+  
   console.log("Na kraju sam PLAYTURNA");
 }
 
 export function winningCard(player1, player2, winningSuit) {
   const { currentCard: player1Card } = player1;
   const { currentCard: player2Card } = player2;
+
+
+
   console.log(" U winning cardu je");
 
   if (player1Card.suit === winningSuit) {
@@ -187,7 +177,7 @@ export function deepCompareEquals(prevVal, currentVal) {
   return isEqual(prevVal, currentVal);
 }
 
-export function useDeepCompareWithRef(value,prevValue) {
+export function useDeepCompareWithRef(value, prevValue) {
   if (!deepCompareEquals(value, prevValue.current)) {
     prevValue.current = value;
   }

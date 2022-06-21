@@ -6,26 +6,28 @@ export default class Hand {
     this.position = "";
     this.currentCard = {};
     this.typeOfPlayer = "";
-    this.setted=false;
+    this.setted = false;
   }
 
   playCard(playerCard, setPlayer) {
     let newArray = [];
     let playedCard = this.hand.filter((card) => {
       if (card.suit === playerCard.suit && card.value === playerCard.value) {
-        return card; //shift?
+        return card;
       } else {
         newArray.push(card);
       }
     });
 
     setPlayer((prevState) => {
+      let [card] = playedCard;
       let player = Object.assign(prevState, prevState);
       player.hand = newArray;
+      player.currentCard = card
 
       return player;
     });
-    return playedCard.shift();
+    return playedCard[0];
   }
 
   cardsInHand() {
