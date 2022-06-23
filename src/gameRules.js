@@ -2,7 +2,7 @@ import sample from "lodash/sample.js";
 import shuffle from "lodash/shuffle.js";
 import Game from "./gameTrack.js";
 import { EE } from "./CardImages.js";
-import { isEqual } from "lodash";
+import { useRef, useEffect } from "react";
 
 let TABLE_POSITION = { left: 1, up: 2, right: 1, down: 2 };
 const CARD_VALUE_MAP = {
@@ -17,6 +17,7 @@ const CARD_VALUE_MAP = {
   2: 9,
   3: 10,
 };
+const ONLY_POINTS = ["JK", "KN", "KG", "2", "3"];
 
 export function takeSeat(...players) {
   let table = shuffle(Object.keys(TABLE_POSITION));
@@ -49,7 +50,8 @@ export async function PlayTurn(
   secondPlayer,
   setsecondPlayer,
   cardsPlayed,
-  setnextTurnFlag
+  setwinningSuitObject,
+  thisTurnCards
 ) {
   const { hand: lastTurnWinnerHand } = lastWinner;
   console.log("Usao u playCard");
@@ -69,9 +71,13 @@ export async function PlayTurn(
       console.log("Last player: played a card:", winningCard);
     }
     cardsPlayed.current += 1;
-    setWiningSuit(winningCard.suit);
 
+    thisTurnCards.current.push(winningCard);
+
+    setwinningSuitObject(winningCard);
+    setWiningSuit(winningCard.suit);
   }
+
   //While
   else {
     if (isPlayerTurn(secondPlayer)) {
@@ -86,17 +92,17 @@ export async function PlayTurn(
       console.log("Second player: played a card:", playedCard);
     }
     cardsPlayed.current += 1;
+    thisTurnCards.current.push(playedCard);
+
     setLastPlayer(secondPlayer);
   }
-  
+
   console.log("Na kraju sam PLAYTURNA");
 }
 
 export function winningCard(player1, player2, winningSuit) {
   const { currentCard: player1Card } = player1;
   const { currentCard: player2Card } = player2;
-
-
 
   console.log(" U winning cardu je");
 
@@ -173,14 +179,80 @@ export function handsAreEmpty(player) {
   return player.cardsInHand() === 0;
 }
 
-export function deepCompareEquals(prevVal, currentVal) {
-  return isEqual(prevVal, currentVal);
+export function AddingCardsToTurnWinner(
+  cardsThrown,
+  lastTurnWinner,
+  gameStats
+) {
+  if (lastTurnWinner.team === 1) {
+    gameStats.current.team1CardsWon.push(...cardsThrown.current);
+    return;
+  }
+  gameStats.current.team2CardsWon.push(...cardsThrown.current);
+  return;
 }
 
-export function useDeepCompareWithRef(value, prevValue) {
-  if (!deepCompareEquals(value, prevValue.current)) {
-    prevValue.current = value;
+export function finalScore(gameStats, lastWinner) {
+  let onlyTeam1 = 0;
+  let pointsTeam1 = 0;
+  let onlyTeam2 = 0;
+  let pointsTeam2 = 0;
+
+  for (const card of gameStats.current.team1CardsWon) {
+    if (card.value === "ACE") pointsTeam1 += 1;
+    else if (ONLY_POINTS.includes(card.value)) onlyTeam1 += 1;
+  }
+  gameStats.current.team1Points = pointsTeam1;
+  gameStats.current.team1Points += coutingOnlyPoints(onlyTeam1);
+
+  for (const card of gameStats.current.team2CardsWon) {
+    if (card.value === "ACE") pointsTeam2 += 1;
+    else if (ONLY_POINTS.includes(card.value)) onlyTeam2 += 1;
   }
 
-  return prevValue.current;
+  gameStats.current.team2Points = pointsTeam2;
+  gameStats.current.team2Points += coutingOnlyPoints(onlyTeam2);
+
+  if (lastWinner.team === 1) gameStats.current.team1Points += 1;
+  else {
+    gameStats.current.team2Points += 1;
+  }
+}
+
+function coutingOnlyPoints(points) {
+  let corretpoints = Math.floor(points / 3);
+
+  return corretpoints;
+}
+
+export function DidIWon({ gameStats, players }) {
+  let myTeam = 0;
+
+  for (const player of players) {
+    if (player.typeOfPlayer === "human") {
+      myTeam = player.team;
+      break;
+    }
+  }
+  console.log(myTeam);
+  console.log("U zbrajanju bodova sam")
+
+  if (myTeam === 1) {
+    if (gameStats.current.team1Points > gameStats.current.team2Points)
+      return <h1>You won, congratulations!</h1>;
+    return <h1>You lost :(</h1>;
+  } else if (myTeam === 2) {
+    if (gameStats.current.team2Points > gameStats.current.team1Points)
+      return <h1>You won. congratulations!</h1>;
+    return <h1>You lost :(</h1>;
+  }
+}
+
+//UsePrevious
+export function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value; //assign the value of ref to the argument
+  }, [value]); //this code will run when the value of 'value' changes
+  return ref.current; //in the end, return the current ref value.
 }

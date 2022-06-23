@@ -1,3 +1,4 @@
+
 export default class Hand {
   constructor(Deck) {
     this.hand = Deck.splice(0, 10);

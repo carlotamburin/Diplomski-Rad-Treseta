@@ -14,8 +14,6 @@ function App() {
   const [player3, setPlayer3] = useState(new Hand(deck.cards));
   const [player4, setPlayer4] = useState(new Hand(deck.cards));
 
-  // Is player Played
-
 
   // initial load
   takeSeat(player1, player2, player3, player4);
@@ -36,4 +34,4 @@ function App() {
 }
 
 export default App;
-//{PlayGame(player1, player2, player3, player4)}
+

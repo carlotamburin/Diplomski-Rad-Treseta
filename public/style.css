@@ -33,6 +33,8 @@ body {
   -moz-box-shadow: 0.2em 0.2em 0.5em #333;
   -webkit-box-shadow: 0.2em 0.2em 0.5em #333;
   box-shadow: 0.2em 0.2em 0.5em #333;
+
+  /* will-change: transform; */
 }
 
 .playingCards a.card {
@@ -127,4 +129,55 @@ body {
 }
 .hand3 {
   grid-area: 3 / 10 / 10 / 11;
+}
+
+.playedCardsTurn {
+  grid-area: 4 / 3 / 5 / 9;
+  place-self: center;
+  margin-bottom: 10px;
+}
+
+/* Start again button */
+#newGame {
+  border-top: 1px solid #96d1f8;
+  background: #65a9d7;
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    from(#3e779d),
+    to(#65a9d7)
+  );
+  background: -webkit-linear-gradient(top, #3e779d, #65a9d7);
+  background: -moz-linear-gradient(top, #3e779d, #65a9d7);
+  background: -ms-linear-gradient(top, #3e779d, #65a9d7);
+  background: -o-linear-gradient(top, #3e779d, #65a9d7);
+  padding: 18.5px 37px;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
+  -webkit-box-shadow: rgba(0, 0, 0, 1) 0 1px 0;
+  -moz-box-shadow: rgba(0, 0, 0, 1) 0 1px 0;
+  box-shadow: rgba(0, 0, 0, 1) 0 1px 0;
+  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;
+  color: white;
+  font-size: 18px;
+  font-family: Helvetica, Arial, Sans-Serif;
+  text-decoration: none;
+  vertical-align: middle;
+  position: absolute;
+  top: 50%;
+}
+#newGame:hover {
+  border-top-color: #28597a;
+  background: #28597a;
+  color: #ccc;
+}
+#newGame:active {
+  border-top-color: #1b435e;
+  background: #1b435e;
+}
+
+.wrapper {
+  text-align: center;
 }

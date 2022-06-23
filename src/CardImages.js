@@ -93,18 +93,32 @@ const svgImages = {
   CardSKG,
 };
 
-export function MapImageToCard(props) {
+export function MapImageToCard({ cards, players }) {
   return (
-    <div className="playingCards rotateHand">
-      {/* {console.log("Usao u CardImages")} */}
-      {Object.keys(props).map((hand, index) => (
-        <CreateCardImage
-          Hand={props[hand].hand}
-          playerNumber={index + 1}
-          key={index + 1}
-        />
-      ))}
-    </div>
+    <>
+      <div className="playingCards rotateHand">
+        {/* {console.log("Usao u CardImages")} */}
+        {Object.keys(players).map((hand, index) => (
+          <CreateCardImage
+            Hand={players[hand].hand}
+            playerNumber={index + 1}
+            key={index + 1}
+          />
+        ))}
+
+        <ul id="hand" className="playedCardsTurn">
+          {cards.current !== undefined ? (
+            cards.current.map((card, index) => {
+              let cardName = "Card" + card.suit + card.value;
+              let Cards = svgImages[cardName];
+              return <Cards className="card" key={index + 1} />;
+            })
+          ) : (
+            <></>
+          )}
+        </ul>
+      </div>
+    </>
   );
 }
 
@@ -132,20 +146,22 @@ export function CreateCardImage({ Hand, playerNumber }) {
   };
 
   return (
-    <ul id="hand" className={playerNumberforClass}>
-      {Hand.map((Card, index) => {
-        let cardName = "Card" + Card.suit + Card.value;
-        let Cards = svgImages[cardName];
-        return (
-          <Cards
-            className={["cardH" + playerNumber, "card"].join(" ")}
-            id={cardName}
-            key={index + 1}
-            onClick={onCardClick}
-            ref={(element) => cardRef.current.push(element)}
-          />
-        );
-      })}
-    </ul>
+    <>
+      <ul id="hand" className={playerNumberforClass}>
+        {Hand.map((Card, index) => {
+          let cardName = "Card" + Card.suit + Card.value;
+          let Cards = svgImages[cardName];
+          return (
+            <Cards
+              className={["cardH" + playerNumber, "card"].join(" ")}
+              id={cardName}
+              key={index + 1}
+              onClick={onCardClick}
+              ref={(element) => cardRef.current.push(element)}
+            />
+          );
+        })}
+      </ul>
+    </>
   );
 }
