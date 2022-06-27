@@ -3,9 +3,10 @@ import shuffle from "lodash/shuffle.js";
 import Game from "./gameTrack.js";
 import { EE } from "./CardImages.js";
 import { useRef, useEffect } from "react";
+import { playCardAI } from "./AI.js";
 
 let TABLE_POSITION = { left: 1, up: 2, right: 1, down: 2 };
-const CARD_VALUE_MAP = {
+export const CARD_VALUE_MAP = {
   4: 1,
   5: 2,
   6: 3,
@@ -51,7 +52,9 @@ export async function PlayTurn(
   setsecondPlayer,
   cardsPlayed,
   setwinningSuitObject,
-  thisTurnCards
+  thisTurnCards,
+  gameStats,
+  players
 ) {
   const { hand: lastTurnWinnerHand } = lastWinner;
   console.log("Usao u playCard");
@@ -68,6 +71,16 @@ export async function PlayTurn(
         sample(lastTurnWinnerHand),
         setlastwinner
       );
+      playCardAI(
+        lastWinner,
+        lastTurnWinnerHand,
+        cardsPlayed,
+        thisTurnCards,
+        lastWinner.currentCard,
+        findParnerCard(lastWinner, players),
+        gameStats
+      );
+
       console.log("Last player: played a card:", winningCard);
     }
     cardsPlayed.current += 1;
@@ -235,7 +248,7 @@ export function DidIWon({ gameStats, players }) {
     }
   }
   console.log(myTeam);
-  console.log("U zbrajanju bodova sam")
+  console.log("U zbrajanju bodova sam");
 
   if (myTeam === 1) {
     if (gameStats.current.team1Points > gameStats.current.team2Points)
@@ -243,7 +256,7 @@ export function DidIWon({ gameStats, players }) {
     return <h1>You lost :(</h1>;
   } else if (myTeam === 2) {
     if (gameStats.current.team2Points > gameStats.current.team1Points)
-      return <h1>You won. congratulations!</h1>;
+      return <h1>You won, congratulations!</h1>;
     return <h1>You lost :(</h1>;
   }
 }
@@ -255,4 +268,15 @@ export function usePrevious(value) {
     ref.current = value; //assign the value of ref to the argument
   }, [value]); //this code will run when the value of 'value' changes
   return ref.current; //in the end, return the current ref value.
+}
+
+function findParnerCard(player, players) {
+  let parnerCard = {};
+  for (const pl in players) {
+    if (player.team === pl.team && player.position !== pl.position) {
+      parnerCard = pl.currentCard;
+      return parnerCard;
+    }
+  }
+  return parnerCard;
 }

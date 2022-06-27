@@ -1,10 +1,5 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import {
-  AddingCardsToTurnWinner,
-  PlayTurn,
-  finalScore,
-  usePrevious,
-} from "./gameRules.js";
+import { AddingCardsToTurnWinner, PlayTurn, finalScore } from "./gameRules.js";
 import { nextTurn } from "./gameRules.js";
 import { whoPlaysFirst } from "./gameRules.js";
 import { handsAreEmpty } from "./gameRules.js";
@@ -58,7 +53,14 @@ export default function PlayGame({
     team1Points: 0,
     team2Points: 0,
     gameNumber: 0,
+    team1Striscio: {},
+    team2Striscio: {},
+    team1Knocking: false,
+    team2Knockig: false,
+    partnerPlayedTeam1: false,
+    partnerPlayedTeam2: false,
     isEnd: false,
+    cardsInQue: { left: [], up: [], right: [], down: [] },
   });
 
   useEffect(() => {
@@ -68,6 +70,8 @@ export default function PlayGame({
     const players = [player1, player2, player3, player4];
 
     if (players.every(handsAreEmpty) && numberOfRenders.current === 0) {
+      gameStats.current.gameNumber += 1;
+
       return;
     }
 
@@ -97,7 +101,9 @@ export default function PlayGame({
           setsecondPlayer,
           cardsPlayed,
           setwinningSuitObject,
-          thisTurnCards
+          thisTurnCards,
+          gameStats,
+          players
         );
       }, 1000);
     }
@@ -135,7 +141,6 @@ export default function PlayGame({
     //Temp
     finalScore(gameStats, lastwinner);
     console.log(gameStats.current);
-    gameStats.current.gameNumber += 1;
     gameStats.current.isEnd = true;
     console.log("It's next turn");
   }, [lastTurn, lastwinner]);
