@@ -18,7 +18,7 @@ export const CARD_VALUE_MAP = {
   2: 9,
   3: 10,
 };
-const ONLY_POINTS = ["JK", "KN", "KG", "2", "3"];
+export const ONLY_POINTS = ["JK", "KN", "KG", "2", "3"];
 
 export function takeSeat(...players) {
   let table = shuffle(Object.keys(TABLE_POSITION));
@@ -54,32 +54,53 @@ export async function PlayTurn(
   setwinningSuitObject,
   thisTurnCards,
   gameStats,
+  isFirstPlayer,
   players
 ) {
   const { hand: lastTurnWinnerHand } = lastWinner;
+  const { hand: secondPlayerHand } = secondPlayer;
   console.log("Usao u playCard");
   let winningCard;
   let playedCard;
 
+  const aiParameterslastWinner = [
+    lastWinner,
+    lastTurnWinnerHand,
+    cardsPlayed,
+    thisTurnCards,
+    lastWinner.currentCard,
+    findParnerCard(lastWinner, players),
+    gameStats,
+    isFirstPlayer,
+  ];
+
+  const aiParametersSecondPlayer = [
+    secondPlayer,
+    secondPlayerHand,
+    cardsPlayed,
+    thisTurnCards,
+    lastWinner.currentCard,
+    findParnerCard(secondPlayer, players),
+    gameStats,
+    isFirstPlayer,
+  ];
+
   if (cardsPlayed.current === 0) {
+    isFirstPlayer.current = true;
     if (isPlayerTurn(lastWinner)) {
       let clickedCard = await waitUserClick();
       winningCard = lastWinner.playCard(clickedCard.arg1, setlastwinner);
       console.log("Last player: played a card:", winningCard);
     } else {
-      winningCard = lastWinner.playCard(
-        sample(lastTurnWinnerHand),
-        setlastwinner
-      );
-      playCardAI(
-        lastWinner,
-        lastTurnWinnerHand,
-        cardsPlayed,
-        thisTurnCards,
-        lastWinner.currentCard,
-        findParnerCard(lastWinner, players),
-        gameStats
-      );
+      // winningCard = lastWinner.playCard(
+      //   sample(lastTurnWinnerHand),
+      //   setlastwinner
+      // );
+      let AICARD = playCardAI(...aiParameterslastWinner);
+
+      winningCard = lastWinner.playCard(AICARD, setlastwinner);
+
+      console.log("AI JE IGRAO", AICARD);
 
       console.log("Last player: played a card:", winningCard);
     }
@@ -93,16 +114,22 @@ export async function PlayTurn(
 
   //While
   else {
+    isFirstPlayer.current = false
     if (isPlayerTurn(secondPlayer)) {
       let clickedCard = await waitUserClick();
       playedCard = secondPlayer.playCard(clickedCard.arg1, setsecondPlayer);
       console.log("Second player: played a card:", playedCard);
     } else {
-      playedCard = secondPlayer.playCard(
-        sample(secondPlayer.hand),
-        setsecondPlayer
-      );
+      // playedCard = secondPlayer.playCard(
+      //   sample(secondPlayerHand),
+      //   setsecondPlayer
+      // );
+      let AICARD = playCardAI(...aiParametersSecondPlayer);
+      playedCard = secondPlayer.playCard(AICARD, setsecondPlayer);
+
       console.log("Second player: played a card:", playedCard);
+
+      console.log("AI JE IGRAO", AICARD);
     }
     cardsPlayed.current += 1;
     thisTurnCards.current.push(playedCard);
@@ -252,12 +279,36 @@ export function DidIWon({ gameStats, players }) {
 
   if (myTeam === 1) {
     if (gameStats.current.team1Points > gameStats.current.team2Points)
-      return <h1>You won, congratulations!</h1>;
-    return <h1>You lost :(</h1>;
+      return (
+        <>
+          <h1>You won, congratulations!</h1>
+          <h2>Your points: {gameStats.current.team1Points}</h2>
+          <h2>Enemy team points: {gameStats.current.team2Points}</h2>
+        </>
+      );
+    return (
+      <>
+        <h1>You lost :(</h1>
+        <h2>Your points: {gameStats.current.team1Points}</h2>
+        <h2>Enemy team points: {gameStats.current.team2Points}</h2>
+      </>
+    );
   } else if (myTeam === 2) {
     if (gameStats.current.team2Points > gameStats.current.team1Points)
-      return <h1>You won, congratulations!</h1>;
-    return <h1>You lost :(</h1>;
+      return (
+        <>
+          <h1>You won, congratulations!</h1>
+          <h2>Your points: {gameStats.current.team2Points}</h2>
+          <h2>Enemy team points: {gameStats.current.team1Points}</h2>
+        </>
+      );
+    return (
+      <>
+        <h1>You lost :(</h1>
+        <h2>Your points: {gameStats.current.team2Points}</h2>
+        <h2>Enemy team points: {gameStats.current.team1Points}</h2>
+      </>
+    );
   }
 }
 
@@ -272,11 +323,13 @@ export function usePrevious(value) {
 
 function findParnerCard(player, players) {
   let parnerCard = {};
-  for (const pl in players) {
+  for (const pl of players) {
     if (player.team === pl.team && player.position !== pl.position) {
       parnerCard = pl.currentCard;
+
       return parnerCard;
     }
   }
+
   return parnerCard;
 }

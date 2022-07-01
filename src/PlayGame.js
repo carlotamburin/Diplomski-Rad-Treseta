@@ -44,6 +44,7 @@ export default function PlayGame({
   }, [lastwinner]);
 
   //useRef
+  const isFirstPlayer = useRef(false);
   const cardsPlayed = useRef(0);
   const numberOfRenders = useRef(0);
   const thisTurnCards = useRef([]);
@@ -53,12 +54,13 @@ export default function PlayGame({
     team1Points: 0,
     team2Points: 0,
     gameNumber: 0,
+    turnNumber:0,
     team1Striscio: {},
     team2Striscio: {},
     team1Knocking: false,
     team2Knockig: false,
-    partnerPlayedTeam1: false,
-    partnerPlayedTeam2: false,
+    team1Knocked: false,
+    team2Knocked: false,
     isEnd: false,
     cardsInQue: { left: [], up: [], right: [], down: [] },
   });
@@ -103,6 +105,7 @@ export default function PlayGame({
           setwinningSuitObject,
           thisTurnCards,
           gameStats,
+          isFirstPlayer,
           players
         );
       }, 1000);
@@ -137,6 +140,7 @@ export default function PlayGame({
     cardsPlayed.current = 0;
     console.log(thisTurnCards.current);
     thisTurnCards.current = [];
+    gameStats.current.turnNumber += 1;
 
     //Temp
     finalScore(gameStats, lastwinner);
