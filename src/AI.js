@@ -14,20 +14,24 @@ export function playCardAI(
 ) {
   let cardToPlay;
   let suit;
+  let doWeHaveNapola;
+
   // Kada odgovaram na prijateljev tucem
 
-  cardToPlay = winAce(myHand, cardsInPlay, winningCard, partnerCard, gameStats);
-  console.log("🚀 ~ file: AI.js ~ line 19 ~ player", player.position);
+  if (gameStats.current.turnNumber === 0) {
+    doWeHaveNapola = napola(player, myHand, gameStats, false);
 
-  if (cardToPlay) {
-    console.log("🚀 ~ file: AI.js ~ line 22 ~ cardToPlay", cardToPlay);
-    return cardToPlay;
+    if (doWeHaveNapola) {
+      cardToPlay = highestCardOfSpecificSuit(winningCard.suit, myHand);
+      if (typeof cardToPlay !== "object")
+        return lowestCardOfSpecificSuit(cardToPlay, myHand);
+      return cardToPlay;
+    }
   }
 
   cardToPlay = ifKnocking(player, gameStats, myHand, partnerCard);
   if (cardToPlay) {
-    console.log("🚀 ~ file: AI.js ~ line 28 ~ cardToPlay", cardToPlay);
-
+    console.log("🚀 ~ file: AI.js ~ line 26 ~ cardToPlay", cardToPlay);
     return cardToPlay;
   }
 
@@ -40,14 +44,21 @@ export function playCardAI(
   if (isFirstPlayer.current && gameStats.current.turnNumber !== 0) {
     cardToPlay = knocking(myHand, player, gameStats);
   }
+
   if (cardToPlay) {
-    console.log("🚀 ~ file: AI.js ~ line 43 ~ cardToPlay", cardToPlay);
+    console.log("🚀 ~ file: AI.js ~ line 41 ~ cardToPlay", cardToPlay);
+    return cardToPlay;
+  }
+
+  cardToPlay = winAce(myHand, cardsInPlay, winningCard, partnerCard, gameStats);
+  if (cardToPlay) {
+    console.log("🚀 ~ file: AI.js ~ line 47 ~ cardToPlay", cardToPlay);
     return cardToPlay;
   }
 
   cardToPlay = winOnlys(cardsInPlay, myHand, winningCard); // Ove istestirati
   if (cardToPlay) {
-    console.log("🚀 ~ file: AI.js ~ line 49 ~ cardToPlay", cardToPlay);
+    console.log("🚀 ~ file: AI.js ~ line 54 ~ cardToPlay", cardToPlay);
     return cardToPlay;
   }
 
@@ -57,6 +68,7 @@ export function playCardAI(
     if (typeof cardToPlay !== "object")
       cardToPlay = lowestCardOfSpecificSuit(cardToPlay, myHand);
     if (cardToPlay) {
+      console.log("🚀 ~ file: AI.js ~ line 63 ~ cardToPlay", cardToPlay);
       return cardToPlay;
     }
 
@@ -70,6 +82,7 @@ export function playCardAI(
     if (typeof cardToPlay !== "object")
       cardToPlay = lowestCardOfSpecificSuit(cardToPlay, myHand);
     if (cardToPlay) {
+      console.log("🚀 ~ file: AI.js ~ line 77 ~ cardToPlay", cardToPlay);
       return cardToPlay;
     }
   }
@@ -135,8 +148,8 @@ function ifKnocking(player, gameStats, myHand, partnerCard) {
 }
 
 function knocking(myHand, player, gameStats) {
-  if (gameStats.current.team1Knocked && gameStats.current.team2Knocked)
-    return 0;
+  if (player.team === 1) if (gameStats.current.team1Knocked) return 0;
+  if (player.team === 2) if (gameStats.current.team2Knocked) return 0;
 
   console.log("U KNOCKINGU SAM");
   const numberOfFollowUpCardsPerSuit = numberOfSameSuitsInHand(myHand);
@@ -173,37 +186,42 @@ function knocking(myHand, player, gameStats) {
   }
 
   //Gledaj jeli ima 3,2,1 i pushaj u odgovarajuci suit u strongCardsInParticularSuit
-  for (let i = 0; i < myHand.length; i++) {
-    const card = myHand[i];
-    if (["3", "2", "ACE"].includes(card.value)) {
-      for (const suit in strongCardsInParticularSuit) {
-        if (suit === card.suit) strongCardsInParticularSuit[suit].push(card);
-      }
-    }
-  }
+  [strongCardsInParticularSuit, maxLenghtSuit] = napola(
+    player,
+    myHand,
+    gameStats,
+    true
+  );
 
   console.log(numberOfFollowUpCardsPerSuit);
   // Gledaj jeli svaki suit sadrzi bar 3 ili 2
-  for (const suit in strongCardsInParticularSuit) {
-    if (
-      strongCardsInParticularSuit[suit].length > maxLenght &&
-      strongCardsInParticularSuit[suit].some((card) => card.value === "3") !==
-        strongCardsInParticularSuit[suit].some((card) => card.value === "2") &&
-      !strongCardsInParticularSuit[suit].some((card) => card.value === "ACE")
-    ) {
-      maxLenght = strongCardsInParticularSuit[suit].length;
-      maxLenghtSuit = suit;
-    } else if (
-      strongCardsInParticularSuit[suit].length === maxLenght &&
-      strongCardsInParticularSuit[suit].some((card) => card.value === "3") !==
-        strongCardsInParticularSuit[suit].some((card) => card.value === "2") &&
-      !strongCardsInParticularSuit[suit].some((card) => card.value === "ACE")
-    ) {
+
+  if (!maxLenghtSuit) {
+    for (const suit in strongCardsInParticularSuit) {
       if (
-        numberOfFollowUpCardsPerSuit[suit] >=
-        numberOfFollowUpCardsPerSuit[maxFollowUpCards]
+        strongCardsInParticularSuit[suit].length > maxLenght &&
+        strongCardsInParticularSuit[suit].some((card) => card.value === "3") !==
+          strongCardsInParticularSuit[suit].some(
+            (card) => card.value === "2"
+          ) &&
+        !strongCardsInParticularSuit[suit].some((card) => card.value === "ACE")
       ) {
+        maxLenght = strongCardsInParticularSuit[suit].length;
         maxLenghtSuit = suit;
+      } else if (
+        strongCardsInParticularSuit[suit].length === maxLenght &&
+        strongCardsInParticularSuit[suit].some((card) => card.value === "3") !==
+          strongCardsInParticularSuit[suit].some(
+            (card) => card.value === "2"
+          ) &&
+        !strongCardsInParticularSuit[suit].some((card) => card.value === "ACE")
+      ) {
+        if (
+          numberOfFollowUpCardsPerSuit[suit] >=
+          numberOfFollowUpCardsPerSuit[maxFollowUpCards]
+        ) {
+          maxLenghtSuit = suit;
+        }
       }
     }
   }
@@ -301,9 +319,9 @@ function winAce(myHand, thisTurnCards, winningCard, partnerCard, gameStats) {
           isCardinPlay({ suit: winningCard.suit, value: "3" }, thisTurnCards) // Dodaj jeli parnerova trica i onda mu daj asha nekog ko nemas tog suita
         ) {
           bestCard = lowestCardOfSpecificSuit(winningCard.suit, myHand);
-          if (typeof bestCard !== "object") {
+          if (typeof bestCard !== "object")
             return lowestCardOfSpecificSuit(bestCard, myHand);
-          } else return bestCard;
+          return bestCard;
         }
         if (
           isCardinPlay({ suit: winningCard.suit, value: "2" }, thisTurnCards)
@@ -313,23 +331,23 @@ function winAce(myHand, thisTurnCards, winningCard, partnerCard, gameStats) {
           ) {
             if (was3OfThisSuitPlayed(winningCard.suit, gameStats)) {
               bestCard = lowestCardOfSpecificSuit(winningCard.suit, myHand);
-              if (typeof bestCard !== "object") {
+              if (typeof bestCard !== "object")
                 return lowestCardOfSpecificSuit(bestCard, myHand);
-              } else return bestCard;
+              return bestCard;
             } else if (
               doIHaveThisCard(myHand, { suit: winningCard.suit, value: "3" })
             ) {
               bestCard = lowestCardOfSpecificSuit(winningCard.suit, myHand);
-              if (typeof bestCard !== "object") {
+              if (typeof bestCard !== "object")
                 return lowestCardOfSpecificSuit(bestCard, myHand);
-              } else return bestCard;
+              return bestCard;
             }
           } else {
             if (was3OfThisSuitPlayed(winningCard.suit, gameStats)) {
               bestCard = lowestCardOfSpecificSuit(winningCard.suit, myHand);
-              if (typeof bestCard !== "object") {
+              if (typeof bestCard !== "object")
                 return lowestCardOfSpecificSuit(bestCard, myHand);
-              } else return bestCard;
+              return bestCard;
             } else if (
               doIHaveThisCard(myHand, { suit: winningCard.suit, value: "3" })
             ) {
@@ -340,29 +358,31 @@ function winAce(myHand, thisTurnCards, winningCard, partnerCard, gameStats) {
               ));
             } else {
               bestCard = lowestCardOfSpecificSuit(winningCard.suit, myHand);
-              if (typeof bestCard !== "object") {
+              if (typeof bestCard !== "object")
                 return lowestCardOfSpecificSuit(bestCard, myHand);
-              } else return bestCard;
+              return bestCard;
             }
           }
         } else {
           if (doIHaveThisCard(myHand, { suit: winningCard.suit, value: "2" })) {
-            return (bestCard = findSpecificCard(myHand, winningCard.suit, "2"));
+            return findSpecificCard(myHand, winningCard.suit, "2");
           }
           if (was2OfThisSuitPlayed(winningCard.suit, gameStats)) {
             bestCard = highestCardOfSpecificSuit(winningCard.suit, myHand);
-            if (typeof bestCard !== "object") {
+            if (typeof bestCard !== "object")
               return lowestCardOfSpecificSuit(bestCard, myHand);
-            } else return bestCard;
+            return bestCard;
           } else {
             bestCard = lowestCardOfSpecificSuit(winningCard.suit, myHand);
-            if (typeof bestCard !== "object") {
+            if (typeof bestCard !== "object")
               return lowestCardOfSpecificSuit(bestCard, myHand);
-            } else return bestCard;
+            return bestCard;
           }
         }
       } else {
-        return (bestCard = highestCardOfSpecificSuit(winningCard.suit, myHand));
+        bestCard = highestCardOfSpecificSuit(winningCard.suit, myHand);
+        if (typeof bestCard !== "object")
+          return lowestCardOfSpecificSuit(bestCard, myHand);
       }
     } else if (card.value === "ACE" && card === partnerCard) {
       if (card.suit === winningCard.suit) {
@@ -370,9 +390,9 @@ function winAce(myHand, thisTurnCards, winningCard, partnerCard, gameStats) {
           isCardinPlay({ suit: winningCard.suit, value: "3" }, thisTurnCards)
         ) {
           bestCard = lowestCardOfSpecificSuit(winningCard.suit, myHand);
-          if (typeof bestCard !== "object") {
+          if (typeof bestCard !== "object")
             return lowestCardOfSpecificSuit(bestCard, myHand);
-          } else return bestCard;
+          return bestCard;
         }
 
         if (
@@ -380,21 +400,21 @@ function winAce(myHand, thisTurnCards, winningCard, partnerCard, gameStats) {
         ) {
           if (was3OfThisSuitPlayed(winningCard.suit, gameStats)) {
             bestCard = lowestCardOfSpecificSuit(winningCard.suit, myHand);
-            if (typeof bestCard !== "object") {
+            if (typeof bestCard !== "object")
               return lowestCardOfSpecificSuit(bestCard, myHand);
-            } else return bestCard;
+            return bestCard;
           } else if (
             doIHaveThisCard(myHand, { suit: winningCard.suit, value: "3" })
           ) {
             bestCard = highestCardOfSpecificSuit(winningCard.suit, myHand);
-            if (typeof bestCard !== "object") {
+            if (typeof bestCard !== "object")
               return lowestCardOfSpecificSuit(bestCard, myHand);
-            } else return bestCard;
+            return bestCard;
           } else {
             bestCard = lowestCardOfSpecificSuit(winningCard.suit, myHand);
-            if (typeof bestCard !== "object") {
+            if (typeof bestCard !== "object")
               return lowestCardOfSpecificSuit(bestCard, myHand);
-            } else return bestCard;
+            return bestCard;
           }
         }
       } else {
@@ -509,8 +529,67 @@ function findSpecificCard(myHand, suit, value) {
   }
 }
 
-function scrichio() {}
+function striscio(myHand) {
+  let numberofSuits = numberOfSameSuitsInHand(myHand);
+}
 
-function ifStrichio() {}
+function ifStriscio(myHand) {}
 
 function winTurnForleadingNextOne() {}
+
+function napola(player, myHand, gameStats, alreadyChecked) {
+  let strongCardsInParticularSuit = { K: [], D: [], B: [], S: [] };
+  const numberOfFollowUpCardsPerSuit = numberOfSameSuitsInHand(myHand);
+  let maxFollowUpCards = 0;
+  let haveNapola = false;
+  let bestNapolaSuit = "";
+
+  for (let i = 0; i < myHand.length; i++) {
+    const card = myHand[i];
+    if (["3", "2", "ACE"].includes(card.value)) {
+      for (const suit in strongCardsInParticularSuit) {
+        if (suit === card.suit) strongCardsInParticularSuit[suit].push(card);
+      }
+    }
+  }
+
+  console.log(strongCardsInParticularSuit);
+  if (alreadyChecked) {
+    for (const suit in strongCardsInParticularSuit) {
+      if (player.team === 1) {
+        if (gameStats.current.team1Napola[suit] === true) {
+          if (numberOfFollowUpCardsPerSuit[suit] >= maxFollowUpCards) {
+            maxFollowUpCards = numberOfFollowUpCardsPerSuit[suit];
+            bestNapolaSuit = suit;
+          }
+        }
+      }
+      if (player.team === 2) {
+        if (gameStats.current.team2Napola[suit] === true) {
+          if (numberOfFollowUpCardsPerSuit[suit] >= maxFollowUpCards) {
+            maxFollowUpCards = numberOfFollowUpCardsPerSuit[suit];
+            bestNapolaSuit = suit;
+          }
+        }
+      }
+    }
+  }
+
+  if (alreadyChecked) return [strongCardsInParticularSuit, bestNapolaSuit];
+
+  for (const suit in strongCardsInParticularSuit) {
+    if (strongCardsInParticularSuit[suit].length === 3) {
+      haveNapola = true;
+      console.log("IMAMO NAPOLU");
+      if (player.team === 1) {
+        gameStats.current.team1Napola[suit] = true;
+      }
+
+      if (player.team === 2) {
+        gameStats.current.team2Napola[suit] = true;
+      }
+    }
+  }
+
+  return haveNapola;
+}
