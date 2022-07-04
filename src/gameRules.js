@@ -72,6 +72,7 @@ export async function PlayTurn(
     findParnerCard(lastWinner, players),
     gameStats,
     isFirstPlayer,
+    players
   ];
 
   const aiParametersSecondPlayer = [
@@ -83,6 +84,7 @@ export async function PlayTurn(
     findParnerCard(secondPlayer, players),
     gameStats,
     isFirstPlayer,
+    players
   ];
 
   if (cardsPlayed.current === 0) {
@@ -114,7 +116,7 @@ export async function PlayTurn(
 
   //While
   else {
-    isFirstPlayer.current = false
+    isFirstPlayer.current = false;
     if (isPlayerTurn(secondPlayer)) {
       let clickedCard = await waitUserClick();
       playedCard = secondPlayer.playCard(clickedCard.arg1, setsecondPlayer);

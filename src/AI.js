@@ -10,7 +10,8 @@ export function playCardAI(
   winningCard,
   partnerCard,
   gameStats,
-  isFirstPlayer
+  isFirstPlayer,
+  players
 ) {
   let cardToPlay;
   let suit;
@@ -29,25 +30,33 @@ export function playCardAI(
     }
   }
 
+  ifEnemyWonOnKnocking(players, gameStats, player); //Ovo provjeri
+
   cardToPlay = ifKnocking(player, gameStats, myHand, partnerCard);
   if (cardToPlay) {
     console.log("🚀 ~ file: AI.js ~ line 26 ~ cardToPlay", cardToPlay);
     return cardToPlay;
   }
 
-  // console.log("Result for is knocking", responseToKnocking);
-  // console.log(gameStats.current.turnNumber);
-  // console.log("Result for is isKnockingTeam1", gameStats.current.team1Knocking);
-  // console.log("Result for is isKnockingTeam2", gameStats.current.team2Knocking);
-
   // Kada tucem
   if (isFirstPlayer.current && gameStats.current.turnNumber !== 0) {
+    //Sto ako enemy uhvati tvoj knocking?
     cardToPlay = knocking(myHand, player, gameStats);
   }
 
   if (cardToPlay) {
     console.log("🚀 ~ file: AI.js ~ line 41 ~ cardToPlay", cardToPlay);
     return cardToPlay;
+  }
+
+  if (ifNapolaIsOver(player, gameStats, isFirstPlayer)) {
+    cardToPlay = napolaFollowUp(player, myHand, gameStats, winningCard);
+
+    if (cardToPlay) {
+      console.log("🚀 ~ file: AI.js ~ line 57 ~ cardToPlay", cardToPlay);
+
+      return cardToPlay;
+    }
   }
 
   cardToPlay = winAce(myHand, cardsInPlay, winningCard, partnerCard, gameStats);
@@ -418,7 +427,9 @@ function winAce(myHand, thisTurnCards, winningCard, partnerCard, gameStats) {
           }
         }
       } else {
-        return highestCardOfSpecificSuit(winningCard.suit, myHand);
+        bestCard = highestCardOfSpecificSuit(winningCard.suit, myHand);
+        if (typeof bestCard !== "object")
+          return lowestCardOfSpecificSuit(bestCard, myHand);
       }
     }
   }
@@ -529,14 +540,6 @@ function findSpecificCard(myHand, suit, value) {
   }
 }
 
-function striscio(myHand) {
-  let numberofSuits = numberOfSameSuitsInHand(myHand);
-}
-
-function ifStriscio(myHand) {}
-
-function winTurnForleadingNextOne() {}
-
 function napola(player, myHand, gameStats, alreadyChecked) {
   let strongCardsInParticularSuit = { K: [], D: [], B: [], S: [] };
   const numberOfFollowUpCardsPerSuit = numberOfSameSuitsInHand(myHand);
@@ -593,3 +596,82 @@ function napola(player, myHand, gameStats, alreadyChecked) {
 
   return haveNapola;
 }
+
+function ifNapolaIsOver(player, gameStats, isFirstPlayer) {
+  if (
+    isFirstPlayer.current &&
+    player.team === 1 &&
+    !gameStats.current.team1NapolaPlayed &&
+    gameStats.current.team1Knocked
+  ) {
+    return true;
+  }
+
+  if (
+    isFirstPlayer.current &&
+    player.team === 2 &&
+    !gameStats.current.team2NapolaPlayed &&
+    gameStats.current.team2Knocked
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function napolaFollowUp(player, myHand, gameStats, winningCard) {
+  let cardToPlay;
+
+  cardToPlay = highestCardOfSpecificSuit(winningCard.suit, myHand);
+  if (typeof cardToPlay !== "object") {
+    cardToPlay = lowestCardOfSpecificSuit(cardToPlay, myHand);
+    if (player.team === 1) gameStats.current.team1NapolaPlayed = true;
+    if (player.team === 2) gameStats.current.team2NapolaPlayed = true;
+
+    return cardToPlay;
+  }
+
+  return cardToPlay;
+}
+
+function ifNapolaFollowUp(myHand) {}
+
+function winTurnForLeadingNextOne() {}
+
+function ifEnemyWonOnKnocking(players, gameStats, player) {
+  if (
+    gameStats.current.lastTurnWinner !==
+    (knockingTeam(gameStats, players) !== 0)
+  ) {
+    if (player.team === 1 && gameStats.current.team1Knocking === true) {
+      // Testiraj i dovrsi
+      gameStats.current.team1Knocking = false;
+      gameStats.current.team1Knocked = true;
+    }
+
+    if (player.team === 2 && gameStats.current.team2Knocking === true) {
+      gameStats.current.team2Knocking = false;
+
+      gameStats.current.team2Knocked = true;
+    }
+  }
+  return 0;
+}
+
+function knockingTeam(gameStats, players) {
+  let allTeamsKnocking = gameStats.current.cardsInQue;
+  let knockingPosition = "";
+
+  for (const position in allTeamsKnocking) {
+    if (allTeamsKnocking[position].length !== 0) knockingPosition = position;
+  }
+  console.log(knockingPosition);
+
+  if (!knockingPosition) return 0;
+
+  for (const player of players) {
+    if (player.position === knockingPosition) return player.team;
+  }
+}
+
+function fix(){}

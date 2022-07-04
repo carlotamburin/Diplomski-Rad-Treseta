@@ -65,6 +65,7 @@ export default function PlayGame({
     team2Napola: { K: false, D: false, B: false, S: false },
     team1NapolaPlayed: false,
     team2NapolaPlyed: false,
+    lastTurnWinner: 0,
     isEnd: false,
     cardsInQue: { left: [], up: [], right: [], down: [] },
   });
@@ -145,6 +146,7 @@ export default function PlayGame({
     console.log(thisTurnCards.current);
     thisTurnCards.current = [];
     gameStats.current.turnNumber += 1;
+    gameStats.current.lastTurnWinner=lastwinner.team
 
     //Temp
     finalScore(gameStats, lastwinner);
