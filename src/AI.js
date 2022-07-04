@@ -30,7 +30,8 @@ export function playCardAI(
     }
   }
 
-  //ifEnemyWonOnKnocking(players, gameStats, player); //Ovo provjeri
+  console.log("HEEJJJJJJJJ")
+  ifEnemyWonOnKnocking(players, gameStats, player); //Ovo provjeri
 
   cardToPlay = ifKnocking(player, gameStats, myHand, partnerCard);
   if (cardToPlay) {
