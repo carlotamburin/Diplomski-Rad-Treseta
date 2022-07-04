@@ -674,4 +674,3 @@ function knockingTeam(gameStats, players) {
   }
 }
 
-function fix(){}
