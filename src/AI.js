@@ -32,6 +32,7 @@ export function playCardAI(
 
   
   ifEnemyWonOnKnocking(players, gameStats, player); //Ovo provjeri
+  //neka promjena
 
   cardToPlay = ifKnocking(player, gameStats, myHand, partnerCard);
   if (cardToPlay) {
