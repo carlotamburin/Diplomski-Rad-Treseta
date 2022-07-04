@@ -30,9 +30,7 @@ export function playCardAI(
     }
   }
 
-  
   ifEnemyWonOnKnocking(players, gameStats, player); //Ovo provjeri
-  //neka promjena
 
   cardToPlay = ifKnocking(player, gameStats, myHand, partnerCard);
   if (cardToPlay) {
@@ -205,9 +203,12 @@ function knocking(myHand, player, gameStats) {
   );
 
   console.log(numberOfFollowUpCardsPerSuit);
+  console.log(strongCardsInParticularSuit);
+  console.log(maxLenghtSuit);
   // Gledaj jeli svaki suit sadrzi bar 3 ili 2
 
-  if (!maxLenghtSuit) {
+  if (maxLenghtSuit === "") {
+    console.log("Usao u dodatnu provjeru");
     for (const suit in strongCardsInParticularSuit) {
       if (
         strongCardsInParticularSuit[suit].length > maxLenght &&
@@ -238,6 +239,8 @@ function knocking(myHand, player, gameStats) {
   }
 
   console.log(strongCardsInParticularSuit);
+  console.log(maxLenghtSuit);
+  if (maxLenghtSuit === "") return 0;
 
   strongestCardsAvailable = strongCardsInParticularSuit[maxLenghtSuit];
 
@@ -675,4 +678,3 @@ function knockingTeam(gameStats, players) {
     if (player.position === knockingPosition) return player.team;
   }
 }
-
