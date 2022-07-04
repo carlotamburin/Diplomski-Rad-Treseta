@@ -1,0 +1,181 @@
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: darkgreen;
+  background-color: #0c6339;
+  /* width: 100%;
+  height: 100%;
+  overflow: hidden */
+}
+
+.playingCards .card {
+  display: inline-flex;
+  width: 3.3em;
+  height: 4.6em;
+  border: 1px solid #666;
+  border-radius: 0.3em;
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+  -khtml-border-radius: 0.3em;
+  padding: 0.25em;
+  margin: -1.5em -1em -1.5em 0em; /*This is important for card look on browser */
+  text-align: center;
+  font-size: 1.2em; /* @change: adjust this value to make bigger or smaller cards */
+  font-weight: normal;
+  font-family: Arial, sans-serif;
+  position: relative;
+  background-color: #fff;
+  -moz-box-shadow: 0.2em 0.2em 0.5em #333;
+  -webkit-box-shadow: 0.2em 0.2em 0.5em #333;
+  box-shadow: 0.2em 0.2em 0.5em #333;
+
+  /* will-change: transform; */
+}
+
+.playingCards a.card {
+  text-decoration: none;
+}
+
+/* selected and hover state */
+.playingCards .card:hover,
+.playingCards .card:active,
+.playingCards .card:focus,
+.playingCards label.card:hover,
+.playingCards strong .card {
+  bottom: 1em;
+}
+.playingCards label.card {
+  cursor: pointer;
+}
+
+.playingCards .card.back {
+  text-indent: -4000px;
+  background-color: #ccc;
+  background-repeat: repeat;
+  background-image: url(data:image/gif;base64,R0lGODlhJAAkAJEAAOjFsezdztOKbL5QKCH5BAAAAAAALAAAAAAkACQAAAL/HC4RAqm/mmLHyHmAbczB11Ea8ombJKSgKo6Z17pXFznmS1JptiX0z3vVhpEKDoUIkoa0olGIUeZUk1RI6Yn2mh/FDAt6frOrRRTqXPpsVLYugzxaVy+YcBdnoWPZOT0E4eckQtZFZBjWoHixQFWl6Nhol6R2p1Okt5TGaEWZA6fjiMdhZgPHeWrTWGVq+jTZg1HYyAEWKLYzmyiGKoUimilz+YYryyTlg5RcDJSAbNx0Q7lMcbIGEyzTK8zVdfVaImzs/QV+prYqWWW2ObkoOApM/Em/rUlIm7fijs8a2EEKEaZ3AsMUgneEU6RcpJbZ27aGHkAO2Ors8xQH1IR0Bn5YnOtVAAA7); /* image is "Pattern 069" from http://www.squidfingers.com/patterns/ */
+  background-image: -moz-repeating-linear-gradient(
+    34% 6% 135deg,
+    #0f1e59,
+    #75a1bf,
+    #3e3e63 50%
+  );
+  background-image: -webkit-gradient(
+    radial,
+    center center,
+    20,
+    center center,
+    80,
+    from(#3c3),
+    color-stop(0.4, #363),
+    to(#030)
+  );
+  /* yes, it's intentional that Mozilla, Webkit, Opera and IE all will get different backgrounds ... why not? :) */
+}
+
+/* hand (in your hand or on table or as a deck)
+********************************************************************/
+
+.playingCards ul.table,
+.playingCards ul.hand,
+.playingCards ul.deck {
+  list-style-type: none;
+  padding: 0;
+  margin: 0 0 1.5em 0;
+  position: relative;
+  clear: both;
+}
+
+/*Verikalni razmak */
+.playingCards ul.hand > * {
+  padding: 30px;
+}
+
+/* Moj css */
+
+.cardH2 {
+  transform: rotate(90deg);
+}
+.cardH3 {
+  transform: rotate(270deg);
+}
+.cardH1 {
+  transform: rotate(180deg);
+}
+
+.playingCards {
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+}
+
+.hand1 {
+  grid-area: 1 / 2 / 2 / 10;
+  place-self: center;
+  margin-bottom: -5px;
+}
+.hand2 {
+  grid-area: 3 / 1 / 10 / 2;
+}
+.hand4 {
+  grid-area: 10 / 2 / 11 / 10;
+  place-self: center;
+}
+.hand3 {
+  grid-area: 3 / 10 / 10 / 11;
+}
+
+.playedCardsTurn {
+  grid-area: 4 / 3 / 5 / 9;
+  place-self: center;
+  margin-bottom: 10px;
+}
+
+/* Start again button */
+#newGame {
+  border-top: 1px solid #96d1f8;
+  background: #65a9d7;
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    from(#3e779d),
+    to(#65a9d7)
+  );
+  background: -webkit-linear-gradient(top, #3e779d, #65a9d7);
+  background: -moz-linear-gradient(top, #3e779d, #65a9d7);
+  background: -ms-linear-gradient(top, #3e779d, #65a9d7);
+  background: -o-linear-gradient(top, #3e779d, #65a9d7);
+  padding: 18.5px 37px;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
+  -webkit-box-shadow: rgba(0, 0, 0, 1) 0 1px 0;
+  -moz-box-shadow: rgba(0, 0, 0, 1) 0 1px 0;
+  box-shadow: rgba(0, 0, 0, 1) 0 1px 0;
+  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;
+  color: white;
+  font-size: 18px;
+  font-family: Helvetica, Arial, Sans-Serif;
+  text-decoration: none;
+  vertical-align: middle;
+  position: absolute;
+  top: 50%;
+}
+#newGame:hover {
+  border-top-color: #28597a;
+  background: #28597a;
+  color: #ccc;
+}
+#newGame:active {
+  border-top-color: #1b435e;
+  background: #1b435e;
+}
+
+.wrapper {
+  text-align: center;
+}
