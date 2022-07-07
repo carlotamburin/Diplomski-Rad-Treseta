@@ -14,7 +14,6 @@ export function playCardAI(
   players
 ) {
   let cardToPlay;
-  let suit;
   let doWeHaveNapola;
 
   // Kada odgovaram na prijateljev tucem
@@ -30,8 +29,6 @@ export function playCardAI(
     }
   }
 
-  ifEnemyWonOnKnocking(players, gameStats, player); //Ovo provjeri
-
   cardToPlay = ifKnocking(player, gameStats, myHand, partnerCard);
   if (cardToPlay) {
     console.log("🚀 ~ file: AI.js ~ line 26 ~ cardToPlay", cardToPlay);
@@ -41,7 +38,7 @@ export function playCardAI(
   // Kada tucem
   if (isFirstPlayer.current && gameStats.current.turnNumber !== 0) {
     //Sto ako enemy uhvati tvoj knocking?
-    cardToPlay = knocking(myHand, player, gameStats);
+    cardToPlay = knocking(myHand, player, gameStats, players);
   }
 
   if (cardToPlay) {
@@ -49,6 +46,7 @@ export function playCardAI(
     return cardToPlay;
   }
 
+  // Sto ako je samo tucen a nema napole, also tuci ne uvik kad si prvi nego kad je pozeljno
   if (ifNapolaIsOver(player, gameStats, isFirstPlayer)) {
     cardToPlay = napolaFollowUp(player, myHand, gameStats, winningCard);
 
@@ -72,28 +70,17 @@ export function playCardAI(
   }
 
   // Kada ne igra prvi
-  if (!isFirstPlayer.current) {
-    cardToPlay = lowestCardOfSpecificSuit(winningCard.suit, myHand);
-    if (typeof cardToPlay !== "object")
-      cardToPlay = lowestCardOfSpecificSuit(cardToPlay, myHand);
-    if (cardToPlay) {
-      console.log("🚀 ~ file: AI.js ~ line 63 ~ cardToPlay", cardToPlay);
-      return cardToPlay;
-    }
-
-    console.log(cardToPlay);
+  cardToPlay = bestPickNotFirst(isFirstPlayer, myHand, winningCard);
+  if (cardToPlay) {
+    console.log("🚀 ~ file: AI.js ~ line 63 ~ cardToPlay", cardToPlay);
+    return cardToPlay;
   }
 
   // kad igra prvi
-  if (isFirstPlayer.current) {
-    suit = numberOfSuitsInHand(myHand);
-    cardToPlay = lowestCardOfSpecificSuit(suit, myHand);
-    if (typeof cardToPlay !== "object")
-      cardToPlay = lowestCardOfSpecificSuit(cardToPlay, myHand);
-    if (cardToPlay) {
-      console.log("🚀 ~ file: AI.js ~ line 77 ~ cardToPlay", cardToPlay);
-      return cardToPlay;
-    }
+  cardToPlay = bestPickFirstPLaying(isFirstPlayer, myHand);
+  if (cardToPlay) {
+    console.log("🚀 ~ file: AI.js ~ line 63 ~ cardToPlay", cardToPlay);
+    return cardToPlay;
   }
 
   console.log("AI nije pronasao rjesenje");
@@ -103,7 +90,7 @@ export function playCardAI(
 function ifKnocking(player, gameStats, myHand, partnerCard) {
   let matchingSuitCards = [];
   let strongestCard = {};
-  let bestAlternativeSuit;
+  if (gameStats.current.cardsInQue[player.position].length !== 0) return 0;
 
   if (player.team === 1) {
     if (gameStats.current.team1Knocking === true) {
@@ -111,10 +98,8 @@ function ifKnocking(player, gameStats, myHand, partnerCard) {
         const card = myHand[i];
         if (card.suit === partnerCard.suit) matchingSuitCards.push(card);
       }
-      if (!matchingSuitCards) {
-        bestAlternativeSuit = numberOfSuitsInHand(myHand);
-        lowestCardOfSpecificSuit(bestAlternativeSuit, myHand);
-      }
+      if (matchingSuitCards.length === 0) return 0;
+
       strongestCard = matchingSuitCards[0];
       for (let i = 0; i < matchingSuitCards.length; i++) {
         const card = matchingSuitCards[i];
@@ -134,10 +119,8 @@ function ifKnocking(player, gameStats, myHand, partnerCard) {
         const card = myHand[i];
         if (card.suit === partnerCard.suit) matchingSuitCards.push(card);
       }
-      if (!matchingSuitCards) {
-        bestAlternativeSuit = numberOfSuitsInHand(myHand);
-        strongestCard = lowestCardOfSpecificSuit(bestAlternativeSuit, myHand);
-      }
+      if (matchingSuitCards.length === 0) return 0;
+
       strongestCard = matchingSuitCards[0];
       for (let i = 0; i < matchingSuitCards.length; i++) {
         const card = matchingSuitCards[i];
@@ -156,7 +139,7 @@ function ifKnocking(player, gameStats, myHand, partnerCard) {
   return 0;
 }
 
-function knocking(myHand, player, gameStats) {
+function knocking(myHand, player, gameStats, players) {
   if (player.team === 1) if (gameStats.current.team1Knocked) return 0;
   if (player.team === 2) if (gameStats.current.team2Knocked) return 0;
 
@@ -176,20 +159,23 @@ function knocking(myHand, player, gameStats) {
   console.log("Usao u knocking funkciju");
   if (player.team === 1) {
     if (gameStats.current.team1Knocking === true) {
-      if (gameStats.current.cardsInQue[player.position] === []) {
+      if (gameStats.current.cardsInQue[player.position].length === 0) {
         gameStats.current.team1Knocking = false;
         gameStats.current.team1Knocked = true;
       }
+      if (ifEnemyWonOnKnocking(players, gameStats, player)) return 0;
+
       return gameStats.current.cardsInQue[player.position].pop();
     }
   }
 
   if (player.team === 2) {
     if (gameStats.current.team2Knocking === true) {
-      if (gameStats.current.cardsInQue[player.position] === []) {
+      if (gameStats.current.cardsInQue[player.position].length === 0) {
         gameStats.current.team2Knocking = false;
         gameStats.current.team2Knocked = true;
       }
+      if (ifEnemyWonOnKnocking(players, gameStats, player)) return 0;
       return gameStats.current.cardsInQue[player.position].pop();
     }
   }
@@ -481,6 +467,8 @@ function lowestWinningCard(winningCards) {
   let bestCard = minBy(winningCards, (card) => {
     return CARD_VALUE_MAP[card.value];
   });
+
+  console.log(bestCard);
   return bestCard;
 }
 
@@ -639,10 +627,6 @@ function napolaFollowUp(player, myHand, gameStats, winningCard) {
   return cardToPlay;
 }
 
-function ifNapolaFollowUp(myHand) {}
-
-function winTurnForLeadingNextOne() {}
-
 function ifEnemyWonOnKnocking(players, gameStats, player) {
   if (
     gameStats.current.lastTurnWinner !==
@@ -652,12 +636,13 @@ function ifEnemyWonOnKnocking(players, gameStats, player) {
       // Testiraj i dovrsi
       gameStats.current.team1Knocking = false;
       gameStats.current.team1Knocked = true;
+      return 1;
     }
 
     if (player.team === 2 && gameStats.current.team2Knocking === true) {
       gameStats.current.team2Knocking = false;
-
       gameStats.current.team2Knocked = true;
+      return 1;
     }
   }
   return 0;
@@ -678,3 +663,35 @@ function knockingTeam(gameStats, players) {
     if (player.position === knockingPosition) return player.team;
   }
 }
+
+function bestPickFirstPLaying(isFirstPlayer, myHand) {
+  let cardToPlay;
+  if (isFirstPlayer.current) {
+    let suit = numberOfSuitsInHand(myHand);
+    cardToPlay = lowestCardOfSpecificSuit(suit, myHand);
+    if (typeof cardToPlay !== "object") {
+      cardToPlay = lowestCardOfSpecificSuit(cardToPlay, myHand);
+      console.log(cardToPlay);
+      return cardToPlay;
+    }
+  }
+  console.log(cardToPlay);
+  return cardToPlay;
+}
+function bestPickNotFirst(isFirstPlayer, myHand, winningCard) {
+  let cardToPlay;
+  if (!isFirstPlayer.current) {
+    cardToPlay = lowestCardOfSpecificSuit(winningCard.suit, myHand);
+    if (typeof cardToPlay !== "object") {
+      cardToPlay = lowestCardOfSpecificSuit(cardToPlay, myHand);
+      console.log(cardToPlay);
+      return cardToPlay;
+    }
+  }
+  console.log(cardToPlay);
+  return cardToPlay;
+}
+
+function ifNapolaFollowUp(myHand) {}
+
+function winTurnForLeadingNextOne() {}
