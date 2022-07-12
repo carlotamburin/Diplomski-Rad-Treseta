@@ -72,7 +72,8 @@ export async function PlayTurn(
     findParnerCard(lastWinner, players),
     gameStats,
     isFirstPlayer,
-    players
+    players,
+    findParner(lastWinner, players),
   ];
 
   const aiParametersSecondPlayer = [
@@ -84,7 +85,8 @@ export async function PlayTurn(
     findParnerCard(secondPlayer, players),
     gameStats,
     isFirstPlayer,
-    players
+    players,
+    findParner(secondPlayer, players),
   ];
 
   if (cardsPlayed.current === 0) {
@@ -94,10 +96,6 @@ export async function PlayTurn(
       winningCard = lastWinner.playCard(clickedCard.arg1, setlastwinner);
       console.log("Last player: played a card:", winningCard);
     } else {
-      // winningCard = lastWinner.playCard(
-      //   sample(lastTurnWinnerHand),
-      //   setlastwinner
-      // );
       let AICARD = playCardAI(...aiParameterslastWinner);
 
       winningCard = lastWinner.playCard(AICARD, setlastwinner);
@@ -122,10 +120,6 @@ export async function PlayTurn(
       playedCard = secondPlayer.playCard(clickedCard.arg1, setsecondPlayer);
       console.log("Second player: played a card:", playedCard);
     } else {
-      // playedCard = secondPlayer.playCard(
-      //   sample(secondPlayerHand),
-      //   setsecondPlayer
-      // );
       let AICARD = playCardAI(...aiParametersSecondPlayer);
       playedCard = secondPlayer.playCard(AICARD, setsecondPlayer);
 
@@ -334,4 +328,17 @@ function findParnerCard(player, players) {
   }
 
   return parnerCard;
+}
+
+function findParner(player, players) {
+  let parner = {};
+  for (const pl of players) {
+    if (player.team === pl.team && player.position !== pl.position) {
+      parner = pl;
+
+      return parner;
+    }
+  }
+
+  return parner;
 }

@@ -11,17 +11,19 @@ export function playCardAI(
   partnerCard,
   gameStats,
   isFirstPlayer,
-  players
+  players,
+  parner
 ) {
   let cardToPlay;
   let doWeHaveNapola;
-
-  // Kada odgovaram na prijateljev tucem
 
   if (gameStats.current.turnNumber === 0) {
     doWeHaveNapola = napola(player, myHand, gameStats, false);
 
     if (doWeHaveNapola) {
+      if (player.team === 1) gameStats.current.team1HaveNapola = true;
+      gameStats.current.team2HaveNapola = true;
+
       cardToPlay = highestCardOfSpecificSuit(winningCard.suit, myHand);
       if (typeof cardToPlay !== "object")
         return lowestCardOfSpecificSuit(cardToPlay, myHand);
@@ -37,10 +39,8 @@ export function playCardAI(
 
   // Kada tucem
   if (isFirstPlayer.current && gameStats.current.turnNumber !== 0) {
-    //Sto ako enemy uhvati tvoj knocking?
     cardToPlay = knocking(myHand, player, gameStats, players);
   }
-
   if (cardToPlay) {
     console.log("🚀 ~ file: AI.js ~ line 41 ~ cardToPlay", cardToPlay);
     return cardToPlay;
@@ -163,7 +163,16 @@ function knocking(myHand, player, gameStats, players) {
         gameStats.current.team1Knocking = false;
         gameStats.current.team1Knocked = true;
       }
-      if (ifEnemyWonOnKnocking(players, gameStats, player)) return 0;
+      if (ifEnemyWonOnKnocking(players, gameStats, player)) {
+        gameStats.current.cardsInQue[player.position].splice(
+          0,
+          gameStats.current.cardsInQue[player.position].length
+        );
+        gameStats.current.team1Knocking = false;
+        gameStats.current.team1Knocked = true;
+
+        return 0;
+      }
 
       return gameStats.current.cardsInQue[player.position].pop();
     }
@@ -175,7 +184,16 @@ function knocking(myHand, player, gameStats, players) {
         gameStats.current.team2Knocking = false;
         gameStats.current.team2Knocked = true;
       }
-      if (ifEnemyWonOnKnocking(players, gameStats, player)) return 0;
+      if (ifEnemyWonOnKnocking(players, gameStats, player)) {
+        gameStats.current.cardsInQue[player.position].splice(
+          0,
+          gameStats.current.cardsInQue[player.position].length
+        );
+        gameStats.current.team2Knocking = false;
+        gameStats.current.team2Knocked = true;
+
+        return 0;
+      }
       return gameStats.current.cardsInQue[player.position].pop();
     }
   }
@@ -595,6 +613,7 @@ function ifNapolaIsOver(player, gameStats, isFirstPlayer) {
     isFirstPlayer.current &&
     player.team === 1 &&
     !gameStats.current.team1NapolaPlayed &&
+    gameStats.current.team1HaveNapola &&
     gameStats.current.team1Knocked
   ) {
     return true;
@@ -604,6 +623,7 @@ function ifNapolaIsOver(player, gameStats, isFirstPlayer) {
     isFirstPlayer.current &&
     player.team === 2 &&
     !gameStats.current.team2NapolaPlayed &&
+    gameStats.current.team2HaveNapola &&
     gameStats.current.team2Knocked
   ) {
     return true;
@@ -620,6 +640,7 @@ function napolaFollowUp(player, myHand, gameStats, winningCard) {
     cardToPlay = lowestCardOfSpecificSuit(cardToPlay, myHand);
     if (player.team === 1) gameStats.current.team1NapolaPlayed = true;
     if (player.team === 2) gameStats.current.team2NapolaPlayed = true;
+    strichio(player, gameStats, winningCard.suit);
 
     return cardToPlay;
   }
@@ -692,6 +713,34 @@ function bestPickNotFirst(isFirstPlayer, myHand, winningCard) {
   return cardToPlay;
 }
 
-function ifNapolaFollowUp(myHand) {}
+function strichio(player, gameStats, winningCardSuit) {
+  if (player.team === 1)
+    gameStats.current.team1Striscio[player.position][winningCardSuit] = true;
+  if (player.team === 2)
+    gameStats.current.team2Striscio[player.position][winningCardSuit] = true;
+}
+
+
+// gledaj di primjeniti, uvik gledaj jel stricho osim kad ti imas skoro sve tog zoga najace
+function ifParnerStrichoOfThisSuit(partner, suit, gameStats) {
+  if (partner.team === 1) {
+    if (gameStats.current.team1Striscio[partner.position][suit]) return true;
+  }
+  if (partner.team === 2) {
+    if (gameStats.current.team2Striscio[partner.position][suit]) return true;
+  }
+
+  return false;
+}
+
+
+
+const helperVarToString = (varObj) => Object.keys(varObj)[0];
+
+function helperGetPlayerData(players) {
+  for (const player of players) {
+    console.log(player.team, player.position);
+  }
+}
 
 function winTurnForLeadingNextOne() {}

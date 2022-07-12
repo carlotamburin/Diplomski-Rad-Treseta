@@ -55,8 +55,14 @@ export default function PlayGame({
     team2Points: 0,
     gameNumber: 0,
     turnNumber: 0,
-    team1Striscio: {},
-    team2Striscio: {},
+    team1Striscio: {
+      left: { K: false, D: false, B: false, S: false },
+      right: { K: false, D: false, B: false, S: false },
+    },
+    team2Striscio: {
+      up: { K: false, D: false, B: false, S: false },
+      down: { K: false, D: false, B: false, S: false },
+    },
     team1Knocking: false,
     team2Knockig: false,
     team1Knocked: false,
@@ -64,7 +70,9 @@ export default function PlayGame({
     team1Napola: { K: false, D: false, B: false, S: false },
     team2Napola: { K: false, D: false, B: false, S: false },
     team1NapolaPlayed: false,
-    team2NapolaPlyed: false,
+    team2NapolaPlayed: false,
+    team1HaveNapola: false,
+    team2HaveNapola: false,
     lastTurnWinner: 0,
     isEnd: false,
     cardsInQue: { left: [], up: [], right: [], down: [] },
@@ -146,7 +154,7 @@ export default function PlayGame({
     console.log(thisTurnCards.current);
     thisTurnCards.current = [];
     gameStats.current.turnNumber += 1;
-    gameStats.current.lastTurnWinner=lastwinner.team
+    gameStats.current.lastTurnWinner = lastwinner.team;
 
     //Temp
     finalScore(gameStats, lastwinner);
