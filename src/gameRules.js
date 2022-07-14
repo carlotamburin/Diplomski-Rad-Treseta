@@ -5,6 +5,10 @@ import { EE } from "./CardImages.js";
 import { useRef, useEffect } from "react";
 import { playCardAI } from "./AI.js";
 
+//Konfeti
+import Confetti from "react-confetti";
+import { useWindowSize } from "@react-hook/window-size";
+
 let TABLE_POSITION = { left: 1, up: 2, right: 1, down: 2 };
 export const CARD_VALUE_MAP = {
   4: 1,
@@ -263,6 +267,7 @@ function coutingOnlyPoints(points) {
 
 export function DidIWon({ gameStats, players }) {
   let myTeam = 0;
+  const { width, height } = useWindowSize();
 
   for (const player of players) {
     if (player.typeOfPlayer === "human") {
@@ -280,6 +285,7 @@ export function DidIWon({ gameStats, players }) {
           <h1>You won, congratulations!</h1>
           <h2>Your points: {gameStats.current.team1Points}</h2>
           <h2>Enemy team points: {gameStats.current.team2Points}</h2>
+          <Confetti width={width} height={height} />
         </>
       );
     return (
@@ -296,6 +302,7 @@ export function DidIWon({ gameStats, players }) {
           <h1>You won, congratulations!</h1>
           <h2>Your points: {gameStats.current.team2Points}</h2>
           <h2>Enemy team points: {gameStats.current.team1Points}</h2>
+          <Confetti width={width} height={height} />
         </>
       );
     return (

@@ -4,6 +4,8 @@ import { useRef } from "react";
 import chunk from "lodash/chunk.js";
 import EventEmitter from "eventemitter3";
 
+//import {ReactComponent as ReactLogo} from './logo.svg';
+
 //dinari
 import CardDACE from "./Cards/dinari/dinarias.png";
 import CardD2 from "./Cards/dinari/dinari2.png";
@@ -52,6 +54,9 @@ import CardSJK from "./Cards/spade/spade11.png";
 import CardSKN from "./Cards/spade/spade12.png";
 import CardSKG from "./Cards/spade/spade13.png";
 
+//Background
+import Back from "./Cards/back.png";
+
 const svgImages = {
   CardDACE,
   CardD2,
@@ -93,9 +98,21 @@ const svgImages = {
   CardSJK,
   CardSKN,
   CardSKG,
+  Back,
 };
 
+export const EE = new EventEmitter();
+export let knocking = false;
+export let striscio = false; // Ocu li mu slati reference pa da promini vrijednost??
+
 export function MapImageToCard({ cards, players }) {
+  const knockingOnClick = (event) => {
+    knocking = true;
+  };
+
+  const striscioOnClick = (event) => {
+    striscio = true;
+  };
   return (
     <>
       <div className="playingCards rotateHand">
@@ -121,12 +138,18 @@ export function MapImageToCard({ cards, players }) {
             <></>
           )}
         </ul>
+        <ul className="KnockStricho">
+          <button className="KnockAndStriscio" onClick={knockingOnClick}>
+            Tučem
+          </button>
+          <button className="KnockAndStriscio" onClick={striscioOnClick}>
+            Strišo
+          </button>
+        </ul>
       </div>
     </>
   );
 }
-
-export const EE = new EventEmitter();
 
 export function CreateCardImage({ Hand, playerNumber }) {
   const cardRef = useRef([]);
@@ -155,7 +178,13 @@ export function CreateCardImage({ Hand, playerNumber }) {
       <ul id="hand" className={playerNumberforClass}>
         {Hand.map((Card, index) => {
           let cardName = "Card" + Card.suit + Card.value;
-          let Cards = svgImages[cardName];
+          let Cards;
+          if (playerNumber !== 4) {
+            Cards = Back;
+          } else {
+            Cards = svgImages[cardName];
+          }
+          //Cards = svgImages[cardName];
           return (
             <img
               src={Cards}

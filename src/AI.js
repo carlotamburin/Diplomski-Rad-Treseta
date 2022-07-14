@@ -12,7 +12,7 @@ export function playCardAI(
   gameStats,
   isFirstPlayer,
   players,
-  parner
+  partner
 ) {
   let cardToPlay;
   let doWeHaveNapola;
@@ -63,12 +63,13 @@ export function playCardAI(
     return cardToPlay;
   }
 
-  cardToPlay = winOnlys(cardsInPlay, myHand, winningCard); // Ove istestirati
-  if (cardToPlay) {
-    console.log("🚀 ~ file: AI.js ~ line 54 ~ cardToPlay", cardToPlay);
-    return cardToPlay;
+  if (!isFirstPlayer) {
+    cardToPlay = winOnlys(cardsInPlay, myHand, winningCard); // Ove istestirati
+    if (cardToPlay) {
+      console.log("🚀 ~ file: AI.js ~ line 54 ~ cardToPlay", cardToPlay);
+      return cardToPlay;
+    }
   }
-
   // Kada ne igra prvi
   cardToPlay = bestPickNotFirst(isFirstPlayer, myHand, winningCard);
   if (cardToPlay) {
@@ -77,7 +78,7 @@ export function playCardAI(
   }
 
   // kad igra prvi
-  cardToPlay = bestPickFirstPLaying(isFirstPlayer, myHand);
+  cardToPlay = bestPickFirstPLaying(isFirstPlayer, myHand, partner, gameStats);
   if (cardToPlay) {
     console.log("🚀 ~ file: AI.js ~ line 63 ~ cardToPlay", cardToPlay);
     return cardToPlay;
@@ -472,7 +473,7 @@ function winOnlys(thisTurnCards, myHand, winningCard) {
 
   if (onlycounter >= 2) {
     winningCards = winningCardsATM(myHand, winningCard);
-  }
+  } else return 0;
 
   bestCard = minBy(winningCards, (card) => {
     return CARD_VALUE_MAP[card.value];
@@ -685,11 +686,38 @@ function knockingTeam(gameStats, players) {
   }
 }
 
-function bestPickFirstPLaying(isFirstPlayer, myHand) {
+function bestPickFirstPLaying(isFirstPlayer, myHand, partner, gameStats) {
   let cardToPlay;
+  let isPartnerStricho;
+  let parnetNotStrichoSuits;
+  let suitsNumber;
   if (isFirstPlayer.current) {
     let suit = numberOfSuitsInHand(myHand);
-    cardToPlay = lowestCardOfSpecificSuit(suit, myHand);
+
+    isPartnerStricho = ifParnerStrichoOfThisSuit(partner, suit, gameStats);
+    parnetNotStrichoSuits = whatSuitsAreNotStriscio(gameStats, partner);
+    suitsNumber = numberOfSameSuitsInHand(myHand);
+
+    if (!isPartnerStricho) cardToPlay = lowestCardOfSpecificSuit(suit, myHand);
+    else {
+      while (true) {
+        if (parnetNotStrichoSuits.length === 0) break;
+
+        suit = parnetNotStrichoSuits.pop();
+        if (suitsNumber[suit] !== 0)
+          isPartnerStricho = ifParnerStrichoOfThisSuit(
+            partner,
+            suit,
+            gameStats
+          );
+
+        if (!isPartnerStricho) {
+          cardToPlay = lowestCardOfSpecificSuit(suit, myHand);
+          break;
+        }
+      }
+    }
+
     if (typeof cardToPlay !== "object") {
       cardToPlay = lowestCardOfSpecificSuit(cardToPlay, myHand);
       console.log(cardToPlay);
@@ -720,7 +748,6 @@ function strichio(player, gameStats, winningCardSuit) {
     gameStats.current.team2Striscio[player.position][winningCardSuit] = true;
 }
 
-
 // gledaj di primjeniti, uvik gledaj jel stricho osim kad ti imas skoro sve tog zoga najace
 function ifParnerStrichoOfThisSuit(partner, suit, gameStats) {
   if (partner.team === 1) {
@@ -733,14 +760,32 @@ function ifParnerStrichoOfThisSuit(partner, suit, gameStats) {
   return false;
 }
 
-
-
 const helperVarToString = (varObj) => Object.keys(varObj)[0];
 
 function helperGetPlayerData(players) {
   for (const player of players) {
     console.log(player.team, player.position);
   }
+}
+
+function whatSuitsAreNotStriscio(gameStats, partner) {
+  let team1StrichoTable = gameStats.current.team1Striscio[partner.position];
+  let team2StrichoTable = gameStats.current.team2Striscio[partner.position];
+
+  let partnerSuitsAvailable = [];
+  if (partner.team === 1) {
+    for (const suit in team1StrichoTable) {
+      if (!team1StrichoTable[suit]) partnerSuitsAvailable.push(suit);
+    }
+  }
+
+  if (partner.team === 2) {
+    for (const suit in team2StrichoTable) {
+      if (!team2StrichoTable[suit]) partnerSuitsAvailable.push(suit);
+    }
+  }
+
+  return partnerSuitsAvailable;
 }
 
 function winTurnForLeadingNextOne() {}
