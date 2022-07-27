@@ -2,96 +2,21 @@
   box-sizing: border-box;
 }
 
-/* .playingCards {
-  box-sizing: border-box;
-  width: 100%;
-  height: 100%;
-
-} */
-
 body {
   background-color: darkgreen;
   background-color: #0c6339;
-  height: 100%;
+  height: 100vh;
   width: 100%;
   margin-top: 0;
   padding: 0;
   /* width: 100%;
   height: 100%;
   overflow: hidden */
+  overflow: hidden;
 }
 
-@media screen and (max-width: 800px) {
-  .playingCards {
-    max-width: 100%; /* The width is 100%, when the viewport is 800px or smaller */
-    max-height: 100%;
-    margin: 0;
-  }
-}
-/* 
-#hand :nth-child(1) {
-  -moz-transform: translate(1.9em, 0.9em) rotate(-42deg);
-  -webkit-transform: translate(1.9em, 0.9em) rotate(-42deg);
-  -o-transform: translate(1.9em, 0.9em) rotate(-42deg);
-  transform: translate(1.9em, 0.9em) rotate(-42deg);
-}
-
-#hand :nth-child(2) {
-  -moz-transform: translate(1.5em, .5em) rotate(-33deg);
-  -webkit-transform: translate(1.5em, .5em) rotate(-33deg);
-  -o-transform: translate(1.5em, .5em) rotate(-33deg);
-  transform: translate(1.5em, .5em) rotate(-33deg);
-}
-#hand :nth-child(3) {
-  -moz-transform: translate(1.1em, .3em) rotate(-24deg);
-  -webkit-transform: translate(1.1em, .3em) rotate(-24deg);
-  -o-transform: translate(1.1em, .3em) rotate(-24deg);
-  transform: translate(1.1em, .3em) rotate(-24deg);
-}
-#hand :nth-child(4) {
-  -moz-transform: translate(.7em, .2em) rotate(-15deg);
-  -webkit-transform: translate(.7em, .2em) rotate(-15deg);
-  -o-transform: translate(.7em, .2em) rotate(-15deg);
-  transform: translate(.7em, .2em) rotate(-15deg);
-}
-#hand :nth-child(5) {
-  -moz-transform: translate(.3em, .1em) rotate(-6deg);
-  -webkit-transform: translate(.3em, .1em) rotate(-6deg);
-  -o-transform: translate(.3em, .1em) rotate(-6deg);
-  transform: translate(.3em, .1em) rotate(-6deg);
-}
-#hand :nth-child(6) {
-  -moz-transform: translate(-.1em, .1em) rotate(3deg);
-  -webkit-transform: translate(-.1em, .1em) rotate(3deg);
-  -o-transform: translate(-.1em, .1em) rotate(3deg);
-  transform: translate(-.1em, .1em) rotate(3deg);
-}
-#hand :nth-child(7) {
-  -moz-transform: translate(-.5em, .2em) rotate(12deg);
-  -webkit-transform: translate(-.5em, .2em) rotate(12deg);
-  -o-transform: translate(-.5em, .2em) rotate(12deg);
-  transform: translate(-.5em, .2em) rotate(12deg);
-}
-#hand :nth-child(8) {
-  -moz-transform: translate(-.9em, .3em) rotate(21deg);
-  -webkit-transform: translate(-.9em, .3em) rotate(21deg);
-  -o-transform: translate(-.9em, .3em) rotate(21deg);
-  transform: translate(-.9em, .3em) rotate(21deg);
-}
-#hand :nth-child(9) {
-  -moz-transform: translate(-1.3em, .6em) rotate(30deg);
-  -webkit-transform: translate(-1.3em, .6em) rotate(30deg);
-  -o-transform: translate(-1.3em, .6em) rotate(30deg);
-  transform: translate(-1.3em, .6em) rotate(30deg);
-}
-#hand :nth-child(10) {
-  -moz-transform: translate(-1.7em, 1em) rotate(39deg);
-  -webkit-transform: translate(-1.7em, 1em) rotate(39deg);
-  -o-transform: translate(-1.7em, 1em) rotate(39deg);
-  transform: translate(-1.7em, 1em) rotate(39deg);
-} */
-
-#hand {
+.cardH3 {
+  margin: -1.5em 1em -1.5em -2em !important;
 }
 
 .card {
@@ -103,11 +28,13 @@ body {
   -moz-border-radius: 0.3em;
   -webkit-border-radius: 0.3em;
   -khtml-border-radius: 0.3em;
-  margin: -1.5em -1em -1.5em 0em; /*This is important for card look on browser */
+  margin: -1.5em -1em -1.5em 0em;
   text-align: center;
   font-size: 1.2em; /* @change: adjust this value to make bigger or smaller cards */
   font-weight: normal;
   font-family: Arial, sans-serif;
+  /* position: absolute;
+  transform-origin: bottom left 120%; */
   position: relative;
   background-color: #fff;
   -moz-box-shadow: 0.2em 0.2em 0.5em #333;
@@ -122,13 +49,37 @@ body {
 }
 
 /* selected and hover state */
-.playingCards .card:hover,
-.playingCards .card:active,
-.playingCards .card:focus,
-.playingCards label.card:hover,
-.playingCards strong .card {
+.hand2,
+.hands2,
+.hand4,
+.card:hover,
+.hand2,
+.hands2,
+.hand4,
+.card:active,
+.hand2,
+.hands2,
+.hand4,
+.card:focus,
+.hand2,
+.hands2,
+.hand4,
+label.card:hover,
+.hand2,
+.hands2,
+.hand4,
+strong .card {
   bottom: 1em;
 }
+
+.hand1 .card:hover,
+.hand1 .card:active,
+.hand1 .card:focus,
+.hand1 label.card:hover,
+.hand1 strong .card {
+  top: 1em;
+}
+
 .playingCards label.card {
   cursor: pointer;
 }
@@ -187,11 +138,10 @@ body {
 }
 
 .playingCards {
+  height: 100vh;
   display: grid;
-  grid-template-columns: repeat(11, 1fr);
-  grid-template-rows: repeat(10, 1fr);
-  /* grid-column-gap: 0px;
-  grid-row-gap: 0px; */
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  grid-template-rows: repeat(auto-fit, minmax(0, 1fr));
 }
 
 .hand1 {
@@ -201,24 +151,28 @@ body {
 .hand2 {
   grid-area: 3 / 1 / 7 / 2;
 }
+.hand3 {
+  grid-area: 3 / 10 / 7 / 11;
+}
+
+/* Umisto hand, koristiti ime karte plus suit plus value kako bi rasporedili po grid */
+
 .hand4 {
   grid-area: 6 / 2 / 7 / 10;
   place-self: center;
-}
-
-.hand4 .card:hover {
-  transform: scale(2.0);
-}
-.hand3 {
-  grid-area: 3 / 10 / 7 / 11;
 }
 
 .playedCardsTurn {
   grid-area: 3 / 3 / 4 / 9;
   place-self: center;
 }
+
+.hand4 .card:hover {
+  transform: scale(2) !important;
+}
+
 .playedCardsTurn .card:hover {
-  transform: scale(2.0);
+  transform: scale(2);
 }
 
 .KnockStricho {
@@ -227,43 +181,47 @@ body {
 }
 /* Start again button */
 #newGame {
-  border-top: 1px solid #96d1f8;
-  background: #65a9d7;
-  background: -webkit-gradient(
-    linear,
-    left top,
-    left bottom,
-    from(#3e779d),
-    to(#65a9d7)
-  );
-  background: -webkit-linear-gradient(top, #3e779d, #65a9d7);
-  background: -moz-linear-gradient(top, #3e779d, #65a9d7);
-  background: -ms-linear-gradient(top, #3e779d, #65a9d7);
-  background: -o-linear-gradient(top, #3e779d, #65a9d7);
-  padding: 18.5px 37px;
-  -webkit-border-radius: 12px;
-  -moz-border-radius: 12px;
-  border-radius: 12px;
-  -webkit-box-shadow: rgba(0, 0, 0, 1) 0 1px 0;
-  -moz-box-shadow: rgba(0, 0, 0, 1) 0 1px 0;
-  box-shadow: rgba(0, 0, 0, 1) 0 1px 0;
-  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;
-  color: white;
-  font-size: 18px;
-  font-family: Helvetica, Arial, Sans-Serif;
+  background: #3d94f6;
+  background-image: -webkit-linear-gradient(top, #3d94f6, #1e62d0);
+  background-image: -moz-linear-gradient(top, #3d94f6, #1e62d0);
+  background-image: -ms-linear-gradient(top, #3d94f6, #1e62d0);
+  background-image: -o-linear-gradient(top, #3d94f6, #1e62d0);
+  background-image: -webkit-gradient(to bottom, #3d94f6, #1e62d0);
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
+  color: #ffffff;
+  font-family: Brush Script MT;
+  font-size: 20px;
+  font-weight: 100;
+  padding: 5vh;
+  -webkit-box-shadow: 1px 1px 20px 0 #000000;
+  -moz-box-shadow: 1px 1px 20px 0 #000000;
+  box-shadow: 1px 1px 20px 0 #000000;
+  text-shadow: 1px 1px 20px #000000;
+  border: solid #337fed 1px;
   text-decoration: none;
-  vertical-align: middle;
-  position: absolute;
-  top: 50%;
+  cursor: pointer;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 #newGame:hover {
-  border-top-color: #28597a;
-  background: #28597a;
-  color: #ccc;
+  border: solid #337fed 1px;
+  background: #1e62d0;
+  background-image: -webkit-linear-gradient(top, #1e62d0, #3d94f6);
+  background-image: -moz-linear-gradient(top, #1e62d0, #3d94f6);
+  background-image: -ms-linear-gradient(top, #1e62d0, #3d94f6);
+  background-image: -o-linear-gradient(top, #1e62d0, #3d94f6);
+  background-image: -webkit-gradient(to bottom, #1e62d0, #3d94f6);
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
+  text-decoration: none;
 }
 #newGame:active {
-  border-top-color: #1b435e;
-  background: #1b435e;
+  transform: translateY(4px);
 }
 
 .wrapper {
@@ -312,43 +270,14 @@ body {
   text-decoration: none;
 }
 
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #e0d8d8;
-  min-width: 160px;
-  overflow: auto;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
+.newGameText {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 100;
 }
 
-.dropdown-content div {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
+.KnockAndStriscio:active {
+  transform: translateY(4px);
 }
 
-.dropdown-content div:hover {background-color: #ddd}
-
-.dropdown-content2 {
-  display: none;
-  position: absolute;
-  background-color: #e0d8d8;
-  min-width: 160px;
-  overflow: auto;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-}
-
-.dropdown-content2 div {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-
-.dropdown-content2 div:hover {background-color: #ddd}
-
-
-.show {display:block;}
+/* New game text */

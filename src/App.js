@@ -6,6 +6,7 @@ import { takeSeat, mapSittingToTable } from "./gameRules.js";
 import PlayGame from "./PlayGame.js";
 
 
+
 function App() {
   const [deck, setDeck] = useState(new Deck());
   deck.shuffler();

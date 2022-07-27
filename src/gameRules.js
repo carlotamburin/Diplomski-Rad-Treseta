@@ -23,6 +23,7 @@ export const CARD_VALUE_MAP = {
   3: 10,
 };
 export const ONLY_POINTS = ["JK", "KN", "KG", "2", "3"];
+export const KNOCKING_VALUES = ["ACE", "2", "3"];
 
 export function takeSeat(...players) {
   let table = shuffle(Object.keys(TABLE_POSITION));
@@ -97,6 +98,18 @@ export async function PlayTurn(
     isFirstPlayer.current = true;
     if (isPlayerTurn(lastWinner)) {
       let clickedCard = await waitUserClick();
+      ifPlayerKnocking(
+        clickedCard.arg1,
+        clickedCard.arg3,
+        lastWinner,
+        gameStats
+      );
+      ifPlayerIsStriscio(
+        clickedCard.arg1,
+        clickedCard.arg4,
+        lastWinner,
+        gameStats
+      );
       winningCard = lastWinner.playCard(clickedCard.arg1, setlastwinner);
       console.log("Last player: played a card:", winningCard);
     } else {
@@ -121,6 +134,18 @@ export async function PlayTurn(
     isFirstPlayer.current = false;
     if (isPlayerTurn(secondPlayer)) {
       let clickedCard = await waitUserClick();
+      ifPlayerKnocking(
+        clickedCard.arg1,
+        clickedCard.arg3,
+        secondPlayer,
+        gameStats
+      );
+      ifPlayerIsStriscio(
+        clickedCard.arg1,
+        clickedCard.arg4,
+        secondPlayer,
+        gameStats
+      );
       playedCard = secondPlayer.playCard(clickedCard.arg1, setsecondPlayer);
       console.log("Second player: played a card:", playedCard);
     } else {
@@ -203,9 +228,9 @@ export function nextTurn(setGameNumber) {
 async function waitUserClick() {
   return await new Promise((resolve, reject) => {
     //If cards played
-    EE.once("click", function listener(arg1, arg2) {
+    EE.once("click", function listener(arg1, arg2, arg3, arg4) {
       console.log("Human played a card!");
-      if (arg2 === "cardH4") resolve({ arg1, arg2 });
+      if (arg2 === "cardH4") resolve({ arg1, arg2, arg3, arg4 });
     });
   });
 }
@@ -282,34 +307,50 @@ export function DidIWon({ gameStats, players }) {
     if (gameStats.current.team1Points > gameStats.current.team2Points)
       return (
         <>
-          <h1>You won, congratulations!</h1>
-          <h2>Your points: {gameStats.current.team1Points}</h2>
-          <h2>Enemy team points: {gameStats.current.team2Points}</h2>
+          <h1 className="newGameText">You won, congratulations!</h1>
+          <h2 className="newGameText">
+            Your points: {gameStats.current.team1Points}
+          </h2>
+          <h2 className="newGameText">
+            Enemy team points: {gameStats.current.team2Points}
+          </h2>
           <Confetti width={width} height={height} />
         </>
       );
     return (
       <>
-        <h1>You lost :(</h1>
-        <h2>Your points: {gameStats.current.team1Points}</h2>
-        <h2>Enemy team points: {gameStats.current.team2Points}</h2>
+        <h1 className="newGameText">You lost :(</h1>
+        <h2 className="newGameText">
+          Your points: {gameStats.current.team1Points}
+        </h2>
+        <h2 className="newGameText">
+          Enemy team points: {gameStats.current.team2Points}
+        </h2>
       </>
     );
   } else if (myTeam === 2) {
     if (gameStats.current.team2Points > gameStats.current.team1Points)
       return (
         <>
-          <h1>You won, congratulations!</h1>
-          <h2>Your points: {gameStats.current.team2Points}</h2>
-          <h2>Enemy team points: {gameStats.current.team1Points}</h2>
+          <h1 className="newGameText">You won, congratulations!</h1>
+          <h2 className="newGameText">
+            Your points: {gameStats.current.team2Points}
+          </h2>
+          <h2 className="newGameText">
+            Enemy team points: {gameStats.current.team1Points}
+          </h2>
           <Confetti width={width} height={height} />
         </>
       );
     return (
       <>
-        <h1>You lost :(</h1>
-        <h2>Your points: {gameStats.current.team2Points}</h2>
-        <h2>Enemy team points: {gameStats.current.team1Points}</h2>
+        <h1 className="newGameText">You lost :(</h1>
+        <h2 className="newGameText">
+          Your points: {gameStats.current.team2Points}
+        </h2>
+        <h2 className="newGameText">
+          Enemy team points: {gameStats.current.team1Points}
+        </h2>
       </>
     );
   }
@@ -348,4 +389,60 @@ function findParner(player, players) {
   }
 
   return parner;
+}
+
+function ifPlayerKnocking(
+  cardToPlay,
+  knockingButtonPressed,
+  player,
+  gameStats
+) {
+  console.log("U Tucem playeru sam");
+  if (knockingButtonPressed) {
+    if (player.team === 1) {
+      gameStats.current.team1Knocking = true;
+    }
+    if (player.team === 2) {
+      gameStats.current.team1Knocking = true;
+    }
+
+    gameStats.current.playerKnockingSuit = cardToPlay.suit;
+    return;
+  }
+
+  if (
+    cardToPlay.suit === gameStats.current.playerKnockingSuit &&
+    KNOCKING_VALUES.includes(cardToPlay.value)
+  )
+    return;
+
+  if (player.team === 1) {
+    gameStats.current.team1Knocking = false;
+    gameStats.current.team1Knocked = true;
+  }
+  if (player.team === 2) {
+    gameStats.current.team2Knocking = false;
+    gameStats.current.team2Knocked = true;
+  }
+}
+
+function ifPlayerIsStriscio(
+  cardToPlay,
+  striscioButtonPressed,
+  player,
+  gameStats
+) {
+  if (striscioButtonPressed) {
+    console.log("Player is stri");
+    if (player.team === 1) {
+      gameStats.current.team1Striscio[player.position][cardToPlay.suit] = true;
+    }
+
+    if (player.team === 2) {
+      gameStats.current.team2Striscio[player.position][cardToPlay.suit] = true;
+    }
+
+    console.log(gameStats.current.team1Striscio);
+    console.log(gameStats.current.team2Striscio);
+  }
 }

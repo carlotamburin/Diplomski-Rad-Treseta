@@ -39,7 +39,14 @@ export function playCardAI(
 
   // Kada tucem
   if (isFirstPlayer.current && gameStats.current.turnNumber !== 0) {
-    cardToPlay = knocking(myHand, player, gameStats, players);
+    cardToPlay = knocking(
+      myHand,
+      player,
+      gameStats,
+      players,
+      cardsInPlay,
+      winningCard
+    );
   }
   if (cardToPlay) {
     console.log("🚀 ~ file: AI.js ~ line 41 ~ cardToPlay", cardToPlay);
@@ -70,7 +77,19 @@ export function playCardAI(
       return cardToPlay;
     }
   }
+
   // Kada ne igra prvi
+  cardToPlay = ifParnerAlreadyWon(
+    myHand,
+    cardsPlayed,
+    partnerCard,
+    winningCard
+  );
+  if (cardToPlay) {
+    console.log("🚀 ~ file: AI.js ~ line 63 ~ cardToPlay", cardToPlay);
+    return cardToPlay;
+  }
+
   cardToPlay = bestPickNotFirst(isFirstPlayer, myHand, winningCard);
   if (cardToPlay) {
     console.log("🚀 ~ file: AI.js ~ line 63 ~ cardToPlay", cardToPlay);
@@ -104,12 +123,21 @@ function ifKnocking(player, gameStats, myHand, partnerCard) {
       strongestCard = matchingSuitCards[0];
       for (let i = 0; i < matchingSuitCards.length; i++) {
         const card = matchingSuitCards[i];
-        if (CARD_VALUE_MAP[card.value] > CARD_VALUE_MAP[strongestCard.value])
+        console.log(
+          CARD_VALUE_MAP[card.value] + ">" + CARD_VALUE_MAP[strongestCard.value]
+        );
+        console.log(
+          CARD_VALUE_MAP[card.value] > CARD_VALUE_MAP[strongestCard.value]
+        );
+        console.log("------------------------------------------------");
+        if (CARD_VALUE_MAP[card.value] > CARD_VALUE_MAP[strongestCard.value]) {
           strongestCard = card;
+        }
       }
       if (strongestCard > partnerCard) {
         gameStats.current.team1Knocking = false;
       }
+      console.log(strongestCard);
       return strongestCard;
     }
   }
@@ -140,9 +168,16 @@ function ifKnocking(player, gameStats, myHand, partnerCard) {
   return 0;
 }
 
-function knocking(myHand, player, gameStats, players) {
-  if (player.team === 1) if (gameStats.current.team1Knocked) return 0;
-  if (player.team === 2) if (gameStats.current.team2Knocked) return 0;
+function knocking(
+  myHand,
+  player,
+  gameStats,
+  players,
+  cardsInPlay,
+  winningCard
+) {
+  if (player.team === 1 && gameStats.current.team1Knocked) return 0;
+  if (player.team === 2 && gameStats.current.team2Knocked) return 0;
 
   console.log("U KNOCKINGU SAM");
   const numberOfFollowUpCardsPerSuit = numberOfSameSuitsInHand(myHand);
@@ -250,6 +285,22 @@ function knocking(myHand, player, gameStats, players) {
   strongestCardsAvailable = strongCardsInParticularSuit[maxLenghtSuit];
 
   console.log(strongestCardsAvailable);
+
+  let enemyStriscioSuit = checkEnemyForStriscio(
+    player,
+    gameStats,
+    cardsInPlay,
+    winningCard,
+    players
+  );
+
+  let willIKnock = checkCanYouKnockOnStriscio(
+    enemyStriscioSuit,
+    strongestCardsAvailable
+  );
+  if (!willIKnock) return 0; //Testiraj
+
+  console.log("KNOCKAM HAHA");
 
   if (strongestCardsAvailable.length >= 1) {
     gameStats.current.cardsInQue[player.position].push(
@@ -512,15 +563,30 @@ function lowestCardOfSpecificSuit(suit, myHand) {
   return lowestWinningCard(matchihSuitCards);
 }
 
-function highestCardOfSpecificSuit(suit, myHand) {
+function highestCardOfSpecificSuit(suit, myHand, alreadyWon = false) {
   let matchihSuitCards = [];
 
   for (const card of myHand) {
     if (card.suit === suit) matchihSuitCards.push(card);
   }
 
-  if (matchihSuitCards.length === 0) return numberOfSuitsInHand(myHand);
+  if (alreadyWon && matchihSuitCards.length !== 0) {
+    let ace = matchihSuitCards.filter((card) => {
+      if (card.value === "ACE") {
+        console.log("POGODAK");
+        return card;
+      }
+    });
+    if (ace.length !== 0) {
+      let [card] = ace;
+      console.log(card);
+      return card;
+    }
+  }
 
+  if (matchihSuitCards.length === 0) return numberOfSuitsInHand(myHand);
+  if (alreadyWon && matchihSuitCards.length !== 0)
+    return highestCardExcept3and2(matchihSuitCards);
   return highestWinningCard(matchihSuitCards);
 }
 
@@ -655,7 +721,6 @@ function ifEnemyWonOnKnocking(players, gameStats, player) {
     (knockingTeam(gameStats, players) !== 0)
   ) {
     if (player.team === 1 && gameStats.current.team1Knocking === true) {
-      // Testiraj i dovrsi
       gameStats.current.team1Knocking = false;
       gameStats.current.team1Knocked = true;
       return 1;
@@ -788,4 +853,128 @@ function whatSuitsAreNotStriscio(gameStats, partner) {
   return partnerSuitsAvailable;
 }
 
-function winTurnForLeadingNextOne() {}
+function checkEnemyForStriscio(
+  player,
+  gameStats,
+  cardsInPlay,
+  winningCard,
+  players
+) {
+  let striscioArray = [];
+  let team2Striscio = gameStats.current.team2Striscio;
+  let team1Striscio = gameStats.current.team1Striscio;
+
+  reconizeUnsaidStriscio(player, gameStats, cardsInPlay, winningCard, players);
+
+  if (player.team === 1) {
+    for (const suit in team2Striscio["up"]) {
+      console.log(team2Striscio["up"][suit]);
+      if (team2Striscio["up"][suit]) {
+        striscioArray.push(suit);
+      }
+      if (team2Striscio["down"][suit]) {
+        striscioArray.push(suit);
+      }
+    }
+  }
+
+  if (player.team === 2) {
+    for (const suit in team1Striscio["up"]) {
+      console.log(team1Striscio["up"][suit]);
+
+      if (team1Striscio["right"][suit]) {
+        striscioArray.push(suit);
+      }
+      if (team1Striscio["left"][suit]) {
+        striscioArray.push(suit);
+      }
+    }
+  }
+
+  if (striscioArray.length !== 0) return striscioArray;
+
+  return [];
+}
+
+function reconizeUnsaidStriscio(
+  player,
+  gameStats,
+  cardsInPlay,
+  winningCard,
+  players
+) {
+  let team2Striscio = gameStats.current.team2Striscio;
+  let team1Striscio = gameStats.current.team1Striscio;
+
+  console.log(cardsInPlay);
+  if (cardsInPlay.current.length === 0) return;
+
+  for (const card of cardsInPlay.current) {
+    if (card.suit !== winningCard.suit) {
+      for (const pl of players) {
+        if (pl.currentCard === card && pl.team !== player.team) {
+          if (player.team === 1)
+            team2Striscio[pl.position][winningCard.suit] = true;
+          else team1Striscio[pl.position][winningCard.suit] = true;
+        }
+      }
+    }
+  }
+}
+
+function checkCanYouKnockOnStriscio(
+  enemyStriscioSuit,
+  strongestCardsAvailable
+) {
+  if (enemyStriscioSuit.length !== 0) {
+    for (const striscioSuit of enemyStriscioSuit) {
+      for (const card of strongestCardsAvailable) {
+        if (card.suit === striscioSuit) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function ifParnerAlreadyWon(myHand, cardsPlayed, partnerCard, winningCard) {
+  let cardToPlay;
+
+  if (cardsPlayed.current === 3 && partnerCard === winningCard) {
+    cardToPlay = highestCardOfSpecificSuit(winningCard.suit, myHand, true);
+    if (typeof cardToPlay !== "object") {
+      return highestCardOfSpecificSuit(cardToPlay, myHand);
+    }
+  } else if (
+    partnerCard.suit === winningCard.suit &&
+    partnerCard.value === "3" &&
+    cardsPlayed.current > 1
+  ) {
+    cardToPlay = highestCardOfSpecificSuit(winningCard.suit, myHand, true);
+    if (typeof cardToPlay !== "object")
+      return highestCardOfSpecificSuit(cardToPlay, myHand);
+  }
+
+  console.log(cardToPlay);
+
+  return cardToPlay;
+}
+
+function highestCardExcept3and2(matchingSuitCards) {
+  let bestCard = matchingSuitCards[0];
+
+  for (const card of matchingSuitCards) {
+    if (
+      !["3", "2"].includes(card.value) &&
+      CARD_VALUE_MAP[card.value] > CARD_VALUE_MAP[bestCard.value]
+    ) {
+      bestCard = card;
+    }
+  }
+
+  console.log(bestCard);
+
+  return bestCard;
+}
+

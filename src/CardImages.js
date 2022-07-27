@@ -100,28 +100,62 @@ const svgImages = {
   CardSKG,
   Back,
 };
-
+//Globals
 export const EE = new EventEmitter();
-export let knocking = false;
-export let striscio = false; // Ocu li mu slati reference pa da promini vrijednost??
+
+function drag(event) {
+  event.dataTransfer.setData("text", event.target.id);
+}
+
+function drop(event) {
+  event.preventDefault();
+}
+
+function allowDrop(event) {
+  event.preventDefault();
+}
 
 export function MapImageToCard({ cards, players }) {
+  const knocking = useRef();
+  const striscio = useRef();
+
   const knockingOnClick = (event) => {
-    knocking = true;
+    knocking.current = true;
+    console.log("tucem");
+
+    let orig = event.target.innerHTML;
+    event.target.innerHTML = "IGRAC TUČE";
+
+    setTimeout(() => {
+      event.target.innerHTML = orig;
+    }, 3000);
   };
 
   const striscioOnClick = (event) => {
-    striscio = true;
+    striscio.current = true;
+
+    let orig = event.target.innerHTML;
+    event.target.innerHTML = "IGRAC JE STRISCIO BAČENOG ZOGA";
+
+    setTimeout(() => {
+      event.target.innerHTML = orig;
+    }, 3000);
   };
   return (
     <>
-      <div className="playingCards rotateHand">
+      <div
+        className="playingCards rotateHand"
+        onDrop={drop}
+        onDragOver={allowDrop}
+      >
         {/* {console.log("Usao u CardImages")} */}
         {Object.keys(players).map((hand, index) => (
           <CreateCardImage
             Hand={players[hand].hand}
             playerNumber={index + 1}
             key={index + 1}
+            knocking={knocking}
+            striscio={striscio}
           />
         ))}
 
@@ -151,13 +185,12 @@ export function MapImageToCard({ cards, players }) {
   );
 }
 
-export function CreateCardImage({ Hand, playerNumber }) {
+export function CreateCardImage({ Hand, playerNumber, knocking, striscio }) {
   const cardRef = useRef([]);
 
   let playerNumberforClass = "hand" + playerNumber;
 
   const onCardClick = (event) => {
-    console.log(event);
     let cardClassName = event.target.className.split(" ")[0];
     let id = event.target.id;
 
@@ -168,7 +201,16 @@ export function CreateCardImage({ Hand, playerNumber }) {
 
     let cardValues = { suit: cardSuit, value: cardNumber };
 
-    EE.emit("click", cardValues, cardClassName);
+    EE.emit(
+      "click",
+      cardValues,
+      cardClassName,
+      knocking.current,
+      striscio.current
+    );
+
+    knocking.current = false;
+    striscio.current = false;
 
     console.log("Player played a card");
   };
@@ -194,6 +236,9 @@ export function CreateCardImage({ Hand, playerNumber }) {
               key={index + 1}
               onClick={onCardClick}
               ref={(element) => cardRef.current.push(element)}
+              draggable="true"
+              onDragStart={drag}
+              onDragEnd={onCardClick}
             />
           );
         })}

@@ -8,6 +8,7 @@ import { nextPlayer } from "./gameRules.js";
 import { whoPlaysFirstDefault } from "./gameRules.js";
 import { MapImageToCard } from "./CardImages.js";
 import { NewGame } from "./NewGame";
+import { makeCardFan } from "./utility.js";
 
 export default function PlayGame({
   player1,
@@ -31,6 +32,11 @@ export default function PlayGame({
   const [winningSuit, setwinningSuit] = useState();
   const [lastTurn, setlastTurn] = useState(false);
   const [winningSuitObject, setwinningSuitObject] = useState({});
+
+  //Timeri
+  const breakBetweenCardsPlayed = useRef();
+  const lastPlayerWonBreak = useRef();
+  const breakOnEndOfGame = useRef();
 
   //useMemo
   const lastPlayerMemo = useMemo(() => {
@@ -67,6 +73,7 @@ export default function PlayGame({
     team2Knockig: false,
     team1Knocked: false,
     team2Knocked: false,
+    playerKnockingSuit: "",
     team1Napola: { K: false, D: false, B: false, S: false },
     team2Napola: { K: false, D: false, B: false, S: false },
     team1NapolaPlayed: false,
@@ -78,7 +85,9 @@ export default function PlayGame({
     cardsInQue: { left: [], up: [], right: [], down: [] },
   });
 
+
   useEffect(() => {
+    //makeCardFan()
     const setSecondPlayerTurns = [1, 3, 5];
     const playCardTurns = [0, 2, 4, 6];
     const setLastWinnerTurns = [3, 5, 7];
@@ -86,7 +95,6 @@ export default function PlayGame({
 
     if (players.every(handsAreEmpty) && numberOfRenders.current === 0) {
       gameStats.current.gameNumber += 1;
-
       return;
     }
 
@@ -96,9 +104,7 @@ export default function PlayGame({
     console.log("LAST WINNER IS :", lastwinner);
 
     if (numberOfRenders.current === 7) {
-      setTimeout(() => {
-        setlastTurn((prevState) => !prevState);
-      }, 1500);
+      setlastTurn((prevState) => !prevState);
     }
 
     if (setLastWinnerTurns.includes(numberOfRenders.current)) {
@@ -106,7 +112,7 @@ export default function PlayGame({
     }
 
     if (playCardTurns.includes(numberOfRenders.current)) {
-      setTimeout(() => {
+      breakBetweenCardsPlayed.current = setTimeout(() => {
         PlayTurn(
           setlastwinner,
           setlastPlayer,
@@ -129,6 +135,11 @@ export default function PlayGame({
     }
 
     numberOfRenders.current += 1;
+
+    return () => {
+      clearTimeout(breakBetweenCardsPlayed.current);
+      clearTimeout(breakOnEndOfGame.current);
+    };
   }, [
     lastPlayerMemo,
     secondPlayerMemo,
@@ -144,29 +155,35 @@ export default function PlayGame({
 
   useEffect(() => {
     if (numberOfRenders.current <= 7) return;
+    lastPlayerWonBreak.current = setTimeout(() => {
+      setlastwinner(whoPlaysFirst(lastwinner, setlastPlayer));
+      AddingCardsToTurnWinner(thisTurnCards, lastwinner, gameStats);
+      setsecondPlayer({});
+      nextTurn(setGameNumber);
+      numberOfRenders.current = 0;
+      cardsPlayed.current = 0;
+      console.log(thisTurnCards.current);
+      thisTurnCards.current = [];
+      gameStats.current.turnNumber += 1;
+      gameStats.current.lastTurnWinner = lastwinner.team;
 
-    setlastwinner(whoPlaysFirst(lastwinner, setlastPlayer));
-    AddingCardsToTurnWinner(thisTurnCards, lastwinner, gameStats);
-    setsecondPlayer({});
-    nextTurn(setGameNumber);
-    numberOfRenders.current = 0;
-    cardsPlayed.current = 0;
-    console.log(thisTurnCards.current);
-    thisTurnCards.current = [];
-    gameStats.current.turnNumber += 1;
-    gameStats.current.lastTurnWinner = lastwinner.team;
+      //Temp
+      finalScore(gameStats, lastwinner);
+      console.log(gameStats.current);
+      gameStats.current.isEnd = true;
+      console.log("It's next turn");
+    }, 1000);
 
-    //Temp
-    finalScore(gameStats, lastwinner);
-    console.log(gameStats.current);
-    gameStats.current.isEnd = true;
-    console.log("It's next turn");
+    return () => {
+      clearTimeout(lastPlayerWonBreak.current);
+    };
   }, [lastTurn, lastwinner]);
 
   const players = [player1, player2, player3, player4];
 
   if (!players.every(handsAreEmpty))
-    return <MapImageToCard cards={thisTurnCards} players={playersInOrder} />;
+    return <MapImageToCard cards={thisTurnCards} players={playersInOrder} />  ;
+
   if (gameStats.current.isEnd === true && numberOfRenders.current === 0)
     return <NewGame gameStats={gameStats} players={playersInOrder} />;
 }
