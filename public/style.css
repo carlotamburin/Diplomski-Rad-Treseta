@@ -140,26 +140,40 @@ strong .card {
 .playingCards {
   height: 100vh;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-  grid-template-rows: repeat(auto-fit, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
+  grid-template-rows: repeat(auto-fit, minmax(10px, 1fr));
+}
+
+.hand4 {
+  display: grid;
+  place-self: center;
+  grid-template-columns: repeat(10, minmax(10px, auto));
+  grid-template-rows: repeat(1, minmax(10px, auto));
+  grid-area: 6 / 2 / 7 / 10;
 }
 
 .hand1 {
+  display: grid;
+  place-self: center;
+  grid-template-columns: repeat(10, minmax(10px, auto));
+  grid-template-rows: repeat(1, minmax(10px, auto));
   grid-area: 2 / 2 / 3 / 10;
-  place-self: center;
 }
-.hand2 {
-  grid-area: 3 / 1 / 7 / 2;
-}
+
 .hand3 {
-  grid-area: 3 / 10 / 7 / 11;
+  display: grid;
+  place-self: center;
+  grid-template-rows: repeat(auto-fit, minmax(10px, 1fr));
+  grid-template-columns: repeat(1, minmax(10px, 1fr));
+  grid-area: 3 / 10 / 6 / 11;
 }
 
-/* Umisto hand, koristiti ime karte plus suit plus value kako bi rasporedili po grid */
-
-.hand4 {
-  grid-area: 6 / 2 / 7 / 10;
+.hand2 {
+  display: grid;
   place-self: center;
+  grid-template-rows: repeat(auto-fit, minmax(10px, 1fr));
+  grid-template-columns: repeat(1, minmax(10px, 1fr));
+  grid-area: 3 / 1 / 6 / 2;
 }
 
 .playedCardsTurn {
