@@ -238,12 +238,6 @@ async function waitUserClick(cardsPlayed, winningSuit, myhand) {
     //If cards played
     EE.on("click", function listener(arg1, arg2, arg3, arg4) {
       console.log("Human played a card!");
-      console.log(arg1.suit);
-      console.log(winningSuit);
-      console.log(EE.eventNames());
-      console.log(EE.listeners("click"));
-      console.log(EE.listenerCount("click"));
-
       if (arg2 === "cardH4") {
         if (cardsPlayed.current === 0) {
           resolve({ arg1, arg2, arg3, arg4 });
@@ -252,6 +246,8 @@ async function waitUserClick(cardsPlayed, winningSuit, myhand) {
           isEmptyOnSuit(winningSuit, myhand)
         ) {
           resolve({ arg1, arg2, arg3, arg4 });
+        } else {
+          wrongCardPressedReaction(arg1);
         }
       }
     });
@@ -476,4 +472,16 @@ function isEmptyOnSuit(suit, myHand) {
   }
 
   return true;
+}
+
+function wrongCardPressedReaction(myCard) {
+  let card = document.getElementById("Card" + myCard.suit + myCard.value);
+  let cardOrigBorderStyle = card.style.borderStyle;
+  let cardOrigBorderColor = card.style.borderColor;
+  card.style.borderStyle = "solid";
+  card.style.borderColor = "rgb(243, 7, 7)";
+  let timeout = setTimeout(() => {
+    card.style.borderStyle = cardOrigBorderStyle;
+    card.style.borderColor = cardOrigBorderColor;
+  }, 500);
 }
