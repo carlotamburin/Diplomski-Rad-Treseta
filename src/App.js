@@ -5,8 +5,6 @@ import Hand from "./hand.js";
 import { takeSeat, mapSittingToTable } from "./gameRules.js";
 import PlayGame from "./PlayGame.js";
 
-
-
 function App() {
   const [deck, setDeck] = useState(new Deck());
   deck.shuffler();
@@ -15,8 +13,6 @@ function App() {
   const [player3, setPlayer3] = useState(new Hand(deck.cards));
   const [player4, setPlayer4] = useState(new Hand(deck.cards));
 
-
-  // initial load
   takeSeat(player1, player2, player3, player4);
 
   let playersInOrder = mapSittingToTable(player1, player2, player3, player4);
@@ -35,4 +31,3 @@ function App() {
 }
 
 export default App;
-

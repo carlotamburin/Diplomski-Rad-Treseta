@@ -44,6 +44,11 @@ body {
   /* will-change: transform; */
 }
 
+.wrongCardPressed {
+  border-style: solid;
+  border-color: rgb(243, 7, 7);
+}
+
 .playingCards a.card {
   text-decoration: none;
 }

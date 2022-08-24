@@ -148,7 +148,6 @@ export function MapImageToCard({ cards, players }) {
         onDrop={drop}
         onDragOver={allowDrop}
       >
-        {/* {console.log("Usao u CardImages")} */}
         {Object.keys(players).map((hand, index) => (
           <CreateCardImage
             Hand={players[hand].hand}
@@ -186,8 +185,6 @@ export function MapImageToCard({ cards, players }) {
 }
 
 export function CreateCardImage({ Hand, playerNumber, knocking, striscio }) {
-  const cardRef = useRef([]);
-
   let playerNumberforClass = "hand" + playerNumber;
 
   const onCardClick = (event) => {
@@ -211,8 +208,6 @@ export function CreateCardImage({ Hand, playerNumber, knocking, striscio }) {
 
     knocking.current = false;
     striscio.current = false;
-
-    console.log("Player played a card");
   };
 
   return (
@@ -226,7 +221,6 @@ export function CreateCardImage({ Hand, playerNumber, knocking, striscio }) {
           } else {
             Cards = svgImages[cardName];
           }
-          //Cards = svgImages[cardName];
           return (
             <img
               src={Cards}
@@ -235,7 +229,6 @@ export function CreateCardImage({ Hand, playerNumber, knocking, striscio }) {
               id={cardName}
               key={index + 1}
               onClick={onCardClick}
-              ref={(element) => cardRef.current.push(element)}
               draggable="true"
               onDragStart={drag}
               onDragEnd={onCardClick}

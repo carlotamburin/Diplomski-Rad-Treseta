@@ -7,17 +7,13 @@ export class Deck {
     this.cards = cards;
   }
 
-  numberOrCards() {
-    return this.cards.length;
-  }
-
   shuffler() {
     this.cards = shuffle(this.cards);
   }
 }
 
 class Card {
-  constructor(suit, value, image) {
+  constructor(suit, value) {
     this.suit = suit;
     this.value = value;
   }
@@ -31,4 +27,3 @@ function freshDeck() {
     });
   });
 }
-

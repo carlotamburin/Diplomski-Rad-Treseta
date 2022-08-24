@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AddingCardsToTurnWinner, PlayTurn, finalScore } from "./gameRules.js";
 import { nextTurn } from "./gameRules.js";
 import { whoPlaysFirst } from "./gameRules.js";
@@ -8,7 +8,6 @@ import { nextPlayer } from "./gameRules.js";
 import { whoPlaysFirstDefault } from "./gameRules.js";
 import { MapImageToCard } from "./CardImages.js";
 import { NewGame } from "./NewGame";
-import { makeCardFan } from "./utility.js";
 
 export default function PlayGame({
   player1,
@@ -25,7 +24,7 @@ export default function PlayGame({
   );
 
   //states
-  const [gameNumber, setGameNumber] = useState(0);
+  const [turnNumber, setTurnNumber] = useState(0);
   const [lastwinner, setlastwinner] = useState(randomFirstPlayer);
   const [secondPlayer, setsecondPlayer] = useState({});
   const [lastPlayer, setlastPlayer] = useState(randomFirstPlayer);
@@ -36,18 +35,6 @@ export default function PlayGame({
   //Timeri
   const breakBetweenCardsPlayed = useRef();
   const lastPlayerWonBreak = useRef();
-  const breakOnEndOfGame = useRef();
-
-  //useMemo
-  const lastPlayerMemo = useMemo(() => {
-    return lastPlayer;
-  }, [lastPlayer]);
-  const secondPlayerMemo = useMemo(() => {
-    return secondPlayer;
-  }, [secondPlayer]);
-  const lastwinnerMemo = useMemo(() => {
-    return lastwinner;
-  }, [lastwinner]);
 
   //useRef
   const isFirstPlayer = useRef(false);
@@ -70,7 +57,7 @@ export default function PlayGame({
       down: { K: false, D: false, B: false, S: false },
     },
     team1Knocking: false,
-    team2Knockig: false,
+    team2Knocking: false,
     team1Knocked: false,
     team2Knocked: false,
     playerKnockingSuit: "",
@@ -85,9 +72,7 @@ export default function PlayGame({
     cardsInQue: { left: [], up: [], right: [], down: [] },
   });
 
-
   useEffect(() => {
-    //makeCardFan()
     const setSecondPlayerTurns = [1, 3, 5];
     const playCardTurns = [0, 2, 4, 6];
     const setLastWinnerTurns = [3, 5, 7];
@@ -125,7 +110,8 @@ export default function PlayGame({
           thisTurnCards,
           gameStats,
           isFirstPlayer,
-          players
+          players,
+          winningSuit
         );
       }, 1000);
     }
@@ -138,40 +124,36 @@ export default function PlayGame({
 
     return () => {
       clearTimeout(breakBetweenCardsPlayed.current);
-      clearTimeout(breakOnEndOfGame.current);
     };
   }, [
-    lastPlayerMemo,
-    secondPlayerMemo,
-    lastwinnerMemo,
+    lastPlayer,
+    secondPlayer,
+    lastwinner,
     player1,
     player2,
     player3,
     player4,
     winningSuit,
-    gameNumber,
+    turnNumber,
     winningSuitObject,
   ]);
 
   useEffect(() => {
     if (numberOfRenders.current <= 7) return;
     lastPlayerWonBreak.current = setTimeout(() => {
-      setlastwinner(whoPlaysFirst(lastwinner, setlastPlayer));
+      whoPlaysFirst(lastwinner, setlastPlayer);
       AddingCardsToTurnWinner(thisTurnCards, lastwinner, gameStats);
       setsecondPlayer({});
-      nextTurn(setGameNumber);
+      nextTurn(setTurnNumber);
       numberOfRenders.current = 0;
       cardsPlayed.current = 0;
-      console.log(thisTurnCards.current);
       thisTurnCards.current = [];
       gameStats.current.turnNumber += 1;
       gameStats.current.lastTurnWinner = lastwinner.team;
 
-      //Temp
       finalScore(gameStats, lastwinner);
-      console.log(gameStats.current);
       gameStats.current.isEnd = true;
-      console.log("It's next turn");
+
     }, 1000);
 
     return () => {
@@ -182,7 +164,7 @@ export default function PlayGame({
   const players = [player1, player2, player3, player4];
 
   if (!players.every(handsAreEmpty))
-    return <MapImageToCard cards={thisTurnCards} players={playersInOrder} />  ;
+    return <MapImageToCard cards={thisTurnCards} players={playersInOrder} />;
 
   if (gameStats.current.isEnd === true && numberOfRenders.current === 0)
     return <NewGame gameStats={gameStats} players={playersInOrder} />;

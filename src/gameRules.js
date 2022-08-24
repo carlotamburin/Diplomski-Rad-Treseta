@@ -60,7 +60,8 @@ export async function PlayTurn(
   thisTurnCards,
   gameStats,
   isFirstPlayer,
-  players
+  players,
+  winningSuit
 ) {
   const { hand: lastTurnWinnerHand } = lastWinner;
   const { hand: secondPlayerHand } = secondPlayer;
@@ -97,7 +98,11 @@ export async function PlayTurn(
   if (cardsPlayed.current === 0) {
     isFirstPlayer.current = true;
     if (isPlayerTurn(lastWinner)) {
-      let clickedCard = await waitUserClick();
+      let clickedCard = await waitUserClick(
+        cardsPlayed,
+        winningSuit,
+        lastTurnWinnerHand
+      );
       ifPlayerKnocking(
         clickedCard.arg1,
         clickedCard.arg3,
@@ -127,13 +132,14 @@ export async function PlayTurn(
 
     setwinningSuitObject(winningCard);
     setWiningSuit(winningCard.suit);
-  }
-
-  //While
-  else {
+  } else {
     isFirstPlayer.current = false;
     if (isPlayerTurn(secondPlayer)) {
-      let clickedCard = await waitUserClick();
+      let clickedCard = await waitUserClick(
+        cardsPlayed,
+        winningSuit,
+        secondPlayerHand
+      );
       ifPlayerKnocking(
         clickedCard.arg1,
         clickedCard.arg3,
@@ -141,6 +147,7 @@ export async function PlayTurn(
         gameStats
       );
       ifPlayerIsStriscio(
+        //Zapisi i ovu provjeru za strischio i tucem u word
         clickedCard.arg1,
         clickedCard.arg4,
         secondPlayer,
@@ -161,6 +168,8 @@ export async function PlayTurn(
 
     setLastPlayer(secondPlayer);
   }
+
+  EE.removeAllListeners("click");
 
   console.log("Na kraju sam PLAYTURNA");
 }
@@ -205,10 +214,9 @@ export function nextPlayer(lastPlayer) {
 }
 
 export function whoPlaysFirst(lastWinner, setlastPlayer) {
-  let nextFirstPlayer = lastWinner;
-  setlastPlayer(nextFirstPlayer);
+  setlastPlayer(lastWinner);
 
-  return nextFirstPlayer;
+  return lastWinner;
 }
 
 export function whoPlaysFirstDefault(player1, player2, player3, player4) {
@@ -218,19 +226,34 @@ export function whoPlaysFirstDefault(player1, player2, player3, player4) {
   return firstPlaying;
 }
 
-export function nextTurn(setGameNumber) {
+export function nextTurn(setTurnNumber) {
   console.log("U kraju sam");
-  setGameNumber((gameNumber) => {
-    return gameNumber + 1;
+  setTurnNumber((turnNumber) => {
+    return turnNumber + 1;
   });
 }
 
-async function waitUserClick() {
+async function waitUserClick(cardsPlayed, winningSuit, myhand) {
   return await new Promise((resolve, reject) => {
     //If cards played
-    EE.once("click", function listener(arg1, arg2, arg3, arg4) {
+    EE.on("click", function listener(arg1, arg2, arg3, arg4) {
       console.log("Human played a card!");
-      if (arg2 === "cardH4") resolve({ arg1, arg2, arg3, arg4 });
+      console.log(arg1.suit);
+      console.log(winningSuit);
+      console.log(EE.eventNames());
+      console.log(EE.listeners("click"));
+      console.log(EE.listenerCount("click"));
+
+      if (arg2 === "cardH4") {
+        if (cardsPlayed.current === 0) {
+          resolve({ arg1, arg2, arg3, arg4 });
+        } else if (
+          arg1.suit === winningSuit ||
+          isEmptyOnSuit(winningSuit, myhand)
+        ) {
+          resolve({ arg1, arg2, arg3, arg4 });
+        }
+      }
     });
   });
 }
@@ -445,4 +468,12 @@ function ifPlayerIsStriscio(
     console.log(gameStats.current.team1Striscio);
     console.log(gameStats.current.team2Striscio);
   }
+}
+
+function isEmptyOnSuit(suit, myHand) {
+  for (const card of myHand) {
+    if (card.suit === suit) return false;
+  }
+
+  return true;
 }
