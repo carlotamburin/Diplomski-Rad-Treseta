@@ -1,6 +1,5 @@
 import sample from "lodash/sample.js";
 import shuffle from "lodash/shuffle.js";
-import Game from "./gameTrack.js";
 import { EE } from "./CardImages.js";
 import { useRef, useEffect } from "react";
 import { playCardAI } from "./AI.js";
@@ -9,7 +8,8 @@ import { playCardAI } from "./AI.js";
 import Confetti from "react-confetti";
 import { useWindowSize } from "@react-hook/window-size";
 
-let TABLE_POSITION = { left: 1, up: 2, right: 1, down: 2 };
+const TABLE_POSITION = { left: 1, up: 2, right: 1, down: 2 };
+let tableSet = {};
 export const CARD_VALUE_MAP = {
   4: 1,
   5: 2,
@@ -33,7 +33,7 @@ export function takeSeat(...players) {
     if (players[i].position === "down") players[i].typeOfPlayer = "human";
     else players[i].typeOfPlayer = "AI";
     players[i].team = TABLE_POSITION[players[i].position];
-    Game.tableSet[players[i].position] = players[i];
+    tableSet[players[i].position] = players[i];
   }
 }
 export function mapSittingToTable(...players) {
@@ -210,7 +210,7 @@ export function nextPlayer(lastPlayer) {
   // console.log("The next player position " + val);
   // console.log("The next player team: " + TABLE_POSITION[val]);
   // console.log("The last player position " + indexOfLastPLayer);
-  return Game.tableSet[val];
+  return tableSet[val];
 }
 
 export function whoPlaysFirst(lastWinner, setlastPlayer) {
