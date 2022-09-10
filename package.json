@@ -1,6 +1,7 @@
 {
   "name": "treseta",
   "version": "0.1.0",
+  "homepage": "https://carlotamburin.github.io/Diplomski-Rad-Treseta",
   "private": true,
   "dependencies": {
     "@react-hook/window-size": "^3.0.7",
