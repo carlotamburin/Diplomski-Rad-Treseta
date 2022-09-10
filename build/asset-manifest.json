@@ -1,7 +1,6 @@
 {
   "files": {
-    "main.css": "/Diplomski-Rad-Treseta/static/css/main.31d6cfe0.css",
-    "main.js": "/Diplomski-Rad-Treseta/static/js/main.3d8c1ca8.js",
+    "main.js": "/Diplomski-Rad-Treseta/static/js/main.5ecc987d.js",
     "static/js/787.e7c4c7cd.chunk.js": "/Diplomski-Rad-Treseta/static/js/787.e7c4c7cd.chunk.js",
     "static/media/bastone12.png": "/Diplomski-Rad-Treseta/static/media/bastone12.f2f22f5edf60d2510e95.png",
     "static/media/bastone13.png": "/Diplomski-Rad-Treseta/static/media/bastone13.3e038c223e7b78354ff6.png",
@@ -45,11 +44,10 @@
     "static/media/dinari5.png": "/Diplomski-Rad-Treseta/static/media/dinari5.ea3feb15d34ecfea33c2.png",
     "static/media/dinari4.png": "/Diplomski-Rad-Treseta/static/media/dinari4.0688efad2e0168926dce.png",
     "index.html": "/Diplomski-Rad-Treseta/index.html",
-    "main.3d8c1ca8.js.map": "/Diplomski-Rad-Treseta/static/js/main.3d8c1ca8.js.map",
+    "main.5ecc987d.js.map": "/Diplomski-Rad-Treseta/static/js/main.5ecc987d.js.map",
     "787.e7c4c7cd.chunk.js.map": "/Diplomski-Rad-Treseta/static/js/787.e7c4c7cd.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.31d6cfe0.css",
-    "static/js/main.3d8c1ca8.js"
+    "static/js/main.5ecc987d.js"
   ]
 }
