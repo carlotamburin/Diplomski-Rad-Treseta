@@ -2,6 +2,7 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+### `Try out the game`
 The link for trying out the game: https://carlotamburin.github.io/Diplomski-Rad-Treseta/
 
 ## Available Scripts
